@@ -130,8 +130,8 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
 
     auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
     auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
-    IIRHighpassCutFilter(leftLowCut,chainSetting,CutCoefficients);
-    IIRHighpassCutFilter(rightLowCut,chainSetting,CutCoefficients);
+    IIRHighpassCutFilter(leftLowCut, chainSetting, CutCoefficients);
+    IIRHighpassCutFilter(rightLowCut, chainSetting, CutCoefficients);
     // leftLowCut.setBypassed<0>(true);
     // leftLowCut.setBypassed<1>(true);
     // leftLowCut.setBypassed<2>(true);
@@ -169,9 +169,6 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     //     leftLowCut.setBypassed<3>(false);
     //     break;
     // }
-
- 
-   
 }
 
 void SampleEQAudioProcessor::releaseResources()
@@ -235,21 +232,19 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     *leftChain.get<ChainPosition::Peak>().coefficients = *peakCoefficients;
     *rightChain.get<ChainPosition::Peak>().coefficients = *peakCoefficients;
 
-    DBG(chainSetting.peakFreq);
 
-    
     auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
-      (
-          chainSetting.lowCutFreq,
-          getSampleRate(),
-          2 * (chainSetting.LowCutSlope + 1)
-      );
+    (
+        chainSetting.lowCutFreq,
+        getSampleRate(),
+        2 * (chainSetting.LowCutSlope + 1)
+    );
 
     auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
     auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
-    IIRHighpassCutFilter(leftLowCut,chainSetting,CutCoefficients);
-    IIRHighpassCutFilter(rightLowCut,chainSetting,CutCoefficients);
-    
+    IIRHighpassCutFilter(leftLowCut, chainSetting, CutCoefficients);
+    IIRHighpassCutFilter(rightLowCut, chainSetting, CutCoefficients);
+
 
     juce::dsp::AudioBlock<float> block(buffer);
 
@@ -380,8 +375,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
     return layout;
 }
 
-void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter,ChainSettings Setting,juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>> CutCoefficients)
+void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter, ChainSettings Setting,
+                                                  juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>>
+                                                  CutCoefficients)
 {
+    //Close all Filter, single don't working
     CutFilter.setBypassed<0>(true);
     CutFilter.setBypassed<1>(true);
     CutFilter.setBypassed<2>(true);
