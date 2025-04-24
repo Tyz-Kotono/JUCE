@@ -61,11 +61,11 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="5" x="0.42" y="0.6653225806451613" useARA="0" uiLastX_Normal="1215"
-          uiLastY_Normal="919" uiopen_Normal="0">
+  <FILTER uid="5" x="0.42" y="0.6653225806451613" useARA="0" uiLastX_Normal="3625"
+          uiLastY_Normal="814" uiopen_Normal="0">
     <PLUGIN name="SampleEQ" format="VST3" category="Fx" manufacturer="yourcompany"
             version="1.0.0" file="G:\JUCE\Program\SampleEQ\Builds\VisualStudio2022\x64\Debug\VST3\SampleEQ.vst3\Contents\x86_64-win\SampleEQ.vst3"
-            uniqueId="f1a1e426" isInstrument="0" fileTime="19665b4ea70" infoUpdateTime="19667004dd7"
+            uniqueId="f1a1e426" isInstrument="0" fileTime="19667824e3f" infoUpdateTime="1966785456e"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95309ad"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
@@ -78,14 +78,14 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="6" x="0.4225" y="0.4032258064516129" useARA="0" uiLastX_Normal="1707"
-          uiLastY_Normal="800" uiopen_Normal="0">
+  <FILTER uid="6" x="0.4225" y="0.4032258064516129" useARA="0" uiLastX_Normal="4143"
+          uiLastY_Normal="775" uiopen_Normal="0">
     <PLUGIN name="AudioFilePlayer" format="VST3" category="Fx" manufacturer="Matkat Music LLC"
             version="1.0.0" file="C:\Program Files\Common Files\VST3\AudioFilePlayer.vst3\Contents\x86_64-win\AudioFilePlayer.vst3"
-            uniqueId="79fe81c" isInstrument="0" fileTime="19666a4d429" infoUpdateTime="19667004dd8"
+            uniqueId="79fe81c" isInstrument="0" fileTime="19666a4d429" infoUpdateTime="1966785456e"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95d02c7"/>
-    <STATE>328.VMjLg7S....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9DiMx3BTIISX1UEaho2ZVkUdAAkKAwDUigWRWkEcQ0VTucmUY4BQlIUQholSh0DQgUWUGkUSUIiXu0jQWoVZgglaGkEZocjawk1StcVZOgTco8jasYlYBQyLrgEMOokMznkTHQyLzEVMngVV0TlSKQCMBkkRlomPHIUQDE0UqQ0TP0zZKw1cVgUZA4hKt3hKt3hKt3hKtXlTU0DUQAURWoULEYzXqEEUXoWQF4RPDYFTzDzUXkWSG4RPDYmKtnWPt3hKt3hKt3hKJUELPUTPqI1aYcEV5UkQQcVTWgEOujzPu0Fbu4VYtQmO77hUSQ0LPwVcmklaSQWXzUlO..</STATE>
+    <STATE>340.VMjLgrT....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9DyMw3BTIISX1UEaho2ZVkUdAAkKAwDUigWRWkEcQ0VTucmUY4BQ1QUQholSh0DQgUWUGkUSUIiXu0jQW01UKoFaxPSao8DRpk1SyHWZOgEZlomPHs1JKwVZKgTZocjauk1RHcVZKgEZocjavk1QHclYlIESu4BdVwVYI4FaxLSaloVNvgEZNMmarkyYOEyZKw1cVgUZA4hKt3hKt3hKt3hKtXlTU0DUQAURWoULEYzXqEEUXoWQF4RPDYFTzDzUXkWSG4RPDYmKtnWPt3hKt3hKt3hKJUELPUTPqI1aYcEV5UkQQcVTWgEOujzPu0Fbu4VYtQmO77hUSQ0LPwVcmklaSQWXzUlO..</STATE>
     <LAYOUT>
       <INPUTS>
         <BUS index="0" layout="L R"/>
