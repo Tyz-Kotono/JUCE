@@ -34,3 +34,6 @@
 
 **/SampleEQ/Builds
 **/SampleEQ/JuceLibraryCode
+
+*.vscode
+*.idea
