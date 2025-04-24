@@ -1,0 +1,3 @@
+[submodule "AudioFilePlayer"]
+	path = AudioFilePlayer
+	url = https://github.com/matkatmusic/AudioFilePlayer.git

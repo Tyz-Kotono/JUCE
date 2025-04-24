@@ -31,9 +31,13 @@
 *.out
 *.app
 
+.vscode
+.idea
+
 
 **/SampleEQ/Builds
 **/SampleEQ/JuceLibraryCode
 
-.vscode
-.idea
+
+**/00_HelloWorld/Builds
+**/00_HelloWorld/JuceLibraryCode
