@@ -10,10 +10,20 @@
 
 #include <JuceHeader.h>
 
+
+struct ChainSettings
+{
+    float peakFreq{0}, peakGainInDecibels{0}, peakQuality{1.0f};
+    float lowCutFreq{0}, highCutFreq{0};
+    int LowCutSlope{0}, highCutSlope{0};
+};
+
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
+
 //==============================================================================
 /**
 */
-class SampleEQAudioProcessor  : public juce::AudioProcessor
+class SampleEQAudioProcessor : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -21,14 +31,14 @@ public:
     ~SampleEQAudioProcessor() override;
 
     //==============================================================================
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
-    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#ifndef JucePlugin_PreferredChannelConfigurations
+    bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
+#endif
 
-    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -45,13 +55,13 @@ public:
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
-    void setCurrentProgram (int index) override;
-    const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
+    void setCurrentProgram(int index) override;
+    const juce::String getProgramName(int index) override;
+    void changeProgramName(int index, const juce::String& newName) override;
 
     //==============================================================================
-    void getStateInformation (juce::MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
+    void getStateInformation(juce::MemoryBlock& destData) override;
+    void setStateInformation(const void* data, int sizeInBytes) override;
 
     //Kotono
     //https://docs.juce.com/master/classAudioProcessorParameter.html
@@ -60,17 +70,25 @@ public:
     {
         *this,
         nullptr,
-        "Paramters",
+        "Parameter",
         CreateParameterLayout(),
     };
+
 private:
     //==============================================================================
 
     using Filter = juce::dsp::IIR::Filter<float>;
-    using CutFilter = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
-    using MonoChain = juce::dsp::ProcessorChain<CutFilter,Filter,CutFilter>;
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
-    MonoChain leftChain,rightChain;
+    MonoChain leftChain, rightChain;
+
+    enum ChainPosition
+    {
+        LowCut,
+        Peak,
+        HighCut
+    };
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleEQAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };
