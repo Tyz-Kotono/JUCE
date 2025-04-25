@@ -25,7 +25,7 @@ struct ChainSettings
     float peakFreq{0}, peakGainInDecibels{0}, peakQuality{1.0f};
     float lowCutFreq{0}, highCutFreq{0};
 
-    Slope LowCutSlope{Slope::Slope_12}, highCutSlope{Slope::Slope_12};
+    Slope LowCutSlope{Slope::Slope_12}, HighCutSlope{Slope::Slope_12};
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
@@ -108,12 +108,8 @@ private:
     using Coefficients = Filter::CoefficientsPtr;
     static void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
 
-    //IIR
-    void UpdateIIRHighpassHigh(const ChainSettings& chainSettings);
-    void IIRHighpassCutFilter(CutFilter& CutFilter, ChainSettings Setting,
-                              juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>> CutCoefficients);
 
-
+    //Low High Cut
     template <int Index, typename ChainType, typename CoefficientType>
     void Update(ChainType& Chain, const CoefficientType& coefficients);
 

@@ -110,7 +110,35 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     UpdatePeakFilter(chainSetting);
 
     // LowCut Butterworth Highpass
-    UpdateIIRHighpassHigh(chainSetting);
+    auto LowCutCoefficients =
+        juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+    (
+        chainSetting.lowCutFreq,
+        getSampleRate(),
+        2 * (chainSetting.LowCutSlope + 1)
+    );
+
+    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
+    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
+
+    UpdateCutFilter(leftLowCut, LowCutCoefficients, chainSetting.LowCutSlope);
+    UpdateCutFilter(rightLowCut, LowCutCoefficients, chainSetting.LowCutSlope);
+
+
+    //High Cut
+    auto HighCutCoefficients =
+       juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
+   (
+       chainSetting.highCutFreq,
+       getSampleRate(),
+       2 * (chainSetting.HighCutSlope + 1)
+   );
+
+    auto& leftHighCut = leftChain.get<ChainPosition::HighCut>();
+    auto& rightHighCut = rightChain.get<ChainPosition::HighCut>();
+
+    UpdateCutFilter(leftHighCut, HighCutCoefficients, chainSetting.HighCutSlope);
+    UpdateCutFilter(rightHighCut, HighCutCoefficients, chainSetting.HighCutSlope);
 }
 
 void SampleEQAudioProcessor::releaseResources()
@@ -166,8 +194,8 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     UpdatePeakFilter(chainSetting);
 
     // LowCut Butterworth Highpass
-    UpdateIIRHighpassHigh(chainSetting);
-    auto LowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+    auto LowCutCoefficients =
+        juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
     (
         chainSetting.lowCutFreq,
         getSampleRate(),
@@ -181,6 +209,23 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     UpdateCutFilter(rightLowCut, LowCutCoefficients, chainSetting.LowCutSlope);
 
 
+    //High Cut
+    auto HighCutCoefficients =
+       juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
+   (
+       chainSetting.highCutFreq,
+       getSampleRate(),
+       2 * (chainSetting.HighCutSlope + 1)
+   );
+
+    auto& leftHighCut = leftChain.get<ChainPosition::HighCut>();
+    auto& rightHighCut = rightChain.get<ChainPosition::HighCut>();
+
+    UpdateCutFilter(leftHighCut, HighCutCoefficients, chainSetting.HighCutSlope);
+    UpdateCutFilter(rightHighCut, HighCutCoefficients, chainSetting.HighCutSlope);
+
+
+    
     juce::dsp::AudioBlock<float> block(buffer);
 
     auto leftBlock = block.getSingleChannelBlock(0);
@@ -232,7 +277,7 @@ void SampleEQAudioProcessor::setStateInformation(const void* data, int sizeInByt
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
-
+#pragma region Paramater
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
 {
     ChainSettings settings;
@@ -247,7 +292,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.peakGainInDecibels = apvts.getRawParameterValue("Peak Gain")->load();
     settings.peakQuality = apvts.getRawParameterValue("Peak Quality")->load();
     settings.LowCutSlope = static_cast<Slope>(apvts.getRawParameterValue("LowCut Slope")->load());
-    settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("High Slope")->load());
+    settings.HighCutSlope = static_cast<Slope>(apvts.getRawParameterValue("High Slope")->load());
 
 
     return settings;
@@ -264,7 +309,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "HighCut Freq", "HighCut Freq",
         juce::NormalisableRange<float>(20.f, 20000.f, 1.0f, 0.25f)
-        , 20.0f));
+        , 20000.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "Peak Freq", "Peak Freq",
@@ -310,6 +355,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
     return layout;
 }
 
+#pragma endregion
+
 #pragma region Single Peak
 
 void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings)
@@ -336,26 +383,6 @@ void SampleEQAudioProcessor::UpdateCoefficients(Coefficients& old, const Coeffic
 
 #pragma region Low Cut IIR
 
-void SampleEQAudioProcessor::UpdateIIRHighpassHigh(const ChainSettings& chainSettings)
-{
-    auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
-    (
-        chainSettings.lowCutFreq,
-        getSampleRate(),
-        2 * (chainSettings.LowCutSlope + 1)
-    );
-
-    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
-    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
-    IIRHighpassCutFilter(leftLowCut, chainSettings, CutCoefficients);
-    IIRHighpassCutFilter(rightLowCut, chainSettings, CutCoefficients);
-}
-
-void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter, ChainSettings Setting,
-                                                  juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>>
-                                                  CutCoefficients)
-{
-}
 
 
 template <int Index, typename ChainType, typename CoefficientType>
@@ -377,18 +404,14 @@ void SampleEQAudioProcessor::UpdateCutFilter(ChainType& Chain, const Coefficient
 
     switch (slope)
     {
-    case Slope_12:
-        Update<0>(Chain, coefficients);
-        break;
-    case Slope_24:
-        Update<1>(Chain, coefficients);
-        break;
-    case Slope_36:
-        Update<2>(Chain, coefficients);
-        break;
-    case Slope_48:
-        Update<3>(Chain, coefficients);
-        break;
+    case Slope_12: Update<0>(Chain, coefficients);
+        break; 
+    case Slope_24: Update<1>(Chain, coefficients);
+        break; 
+    case Slope_36: Update<2>(Chain, coefficients);
+        break; 
+    case Slope_48: Update<3>(Chain, coefficients);
+        break; 
     }
 }
 
