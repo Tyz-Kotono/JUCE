@@ -23,7 +23,7 @@ struct ChainSettings
     float peakFreq{0}, peakGainInDecibels{0}, peakQuality{1.0f};
     float lowCutFreq{0}, highCutFreq{0};
 
-    int LowCutSlope{Slope::Slope_12}, highCutSlope{Slope::Slope_12};
+    Slope  LowCutSlope{Slope::Slope_12}, highCutSlope{Slope::Slope_12};
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
@@ -113,6 +113,14 @@ private:
     void IIRHighpassCutFilter(CutFilter& CutFilter, ChainSettings Setting,
                               juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>> CutCoefficients);
 
+    template<typename  ChainType,typename CoefficientType>
+    void UpdateCutFilter(ChainType& leftLowCut,
+                        const CoefficientType& cutCoefficients,
+                        // const ChainSettings& chainSettings,
+                        const Slope& lowCutSlope
+    );
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };
+

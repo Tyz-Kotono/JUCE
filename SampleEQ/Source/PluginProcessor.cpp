@@ -105,14 +105,12 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     rightChain.prepare(spec);
 
     auto chainSetting = getChainSettings(apvts);
-    
+
     // Single Filter
     UpdatePeakFilter(chainSetting);
-    
+
     // LowCut Butterworth Highpass
     UpdateIIRHighpassHigh(chainSetting);
-  
- 
 }
 
 void SampleEQAudioProcessor::releaseResources()
@@ -163,13 +161,25 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
         buffer.clear(i, 0, buffer.getNumSamples());
 
     auto chainSetting = getChainSettings(apvts);
-    
+
     // Single Filter
     UpdatePeakFilter(chainSetting);
 
     // LowCut Butterworth Highpass
     UpdateIIRHighpassHigh(chainSetting);
-    
+    auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+    (
+        chainSetting.lowCutFreq,
+        getSampleRate(),
+        2 * (chainSetting.LowCutSlope + 1)
+    );
+
+    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
+    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
+
+    UpdateCutFilter(leftLowCut, CutCoefficients, chainSetting.LowCutSlope);
+    UpdateCutFilter(rightLowCut, CutCoefficients, chainSetting.LowCutSlope);
+
 
     juce::dsp::AudioBlock<float> block(buffer);
 
@@ -300,19 +310,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
     return layout;
 }
 
+#pragma region Single Peak
+
 void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings)
 {
     auto peakCoefficients =
-          juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-              getSampleRate(),
-              chainSettings.peakFreq,
-              chainSettings.peakQuality,
-              juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
-          );
+        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            getSampleRate(),
+            chainSettings.peakFreq,
+            chainSettings.peakQuality,
+            juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+        );
 
     //Single Filter
-    UpdateCoefficients(leftChain.get<ChainPosition::Peak>().coefficients,peakCoefficients);
-    UpdateCoefficients(rightChain.get<ChainPosition::Peak>().coefficients,peakCoefficients);
+    UpdateCoefficients(leftChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
+    UpdateCoefficients(rightChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
 }
 
 void SampleEQAudioProcessor::UpdateCoefficients(Coefficients& old, const Coefficients& replacements)
@@ -320,16 +332,19 @@ void SampleEQAudioProcessor::UpdateCoefficients(Coefficients& old, const Coeffic
     // *ptr& 
     *old = *replacements;
 }
+#pragma endregion
+
+#pragma region Low Cut IIR
 
 void SampleEQAudioProcessor::UpdateIIRHighpassHigh(const ChainSettings& chainSettings)
 {
     auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
-  (
-      chainSettings.lowCutFreq,
-      getSampleRate(),
-      2 * (chainSettings.LowCutSlope + 1)
-  );
-    
+    (
+        chainSettings.lowCutFreq,
+        getSampleRate(),
+        2 * (chainSettings.LowCutSlope + 1)
+    );
+
     auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
     auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
     IIRHighpassCutFilter(leftLowCut, chainSettings, CutCoefficients);
@@ -340,47 +355,55 @@ void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter, ChainSet
                                                   juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>>
                                                   CutCoefficients)
 {
-    //Close all Filter, single don't working
-    CutFilter.setBypassed<0>(true);
-    CutFilter.setBypassed<1>(true);
-    CutFilter.setBypassed<2>(true);
-    CutFilter.setBypassed<3>(true);
+}
 
-    switch (Setting.LowCutSlope)
+
+template <typename ChainType, typename CoefficientType>
+void SampleEQAudioProcessor::UpdateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficients,
+                                             const Slope& lowCutSlope)
+{
+    //Close all Filter, single don't working
+    leftLowCut.template setBypassed<0>(true);
+    leftLowCut.template setBypassed<1>(true);
+    leftLowCut.template setBypassed<2>(true);
+    leftLowCut.template setBypassed<3>(true);
+
+    switch (lowCutSlope)
     {
     case Slope_12:
-        *CutFilter.get<0>().coefficients = *CutCoefficients[0];
-        CutFilter.setBypassed<0>(false);
+        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
+        leftLowCut.template setBypassed<0>(false);
         break;
     case Slope_24:
-        *CutFilter.get<0>().coefficients = *CutCoefficients[0];
-        CutFilter.setBypassed<0>(false);
-        *CutFilter.get<1>().coefficients = *CutCoefficients[1];
-        CutFilter.setBypassed<1>(false);
+        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
+        leftLowCut.template setBypassed<0>(false);
+        *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
+        leftLowCut.template setBypassed<1>(false);
         break;
     case Slope_36:
-        *CutFilter.get<0>().coefficients = *CutCoefficients[0];
-        CutFilter.setBypassed<0>(false);
-        *CutFilter.get<1>().coefficients = *CutCoefficients[1];
-        CutFilter.setBypassed<1>(false);
-        *CutFilter.get<2>().coefficients = *CutCoefficients[2];
-        CutFilter.setBypassed<2>(false);
+        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
+        leftLowCut.template setBypassed<0>(false);
+        *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
+        leftLowCut.template setBypassed<1>(false);
+        *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
+        leftLowCut.template setBypassed<2>(false);
 
         break;
     case Slope_48:
-        *CutFilter.get<0>().coefficients = *CutCoefficients[0];
-        CutFilter.setBypassed<0>(false);
-        *CutFilter.get<1>().coefficients = *CutCoefficients[1];
-        CutFilter.setBypassed<1>(false);
-        *CutFilter.get<2>().coefficients = *CutCoefficients[2];
-        CutFilter.setBypassed<2>(false);
-        *CutFilter.get<3>().coefficients = *CutCoefficients[3];
-        CutFilter.setBypassed<3>(false);
+        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
+        leftLowCut.template setBypassed<0>(false);
+        *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
+        leftLowCut.template setBypassed<1>(false);
+        *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
+        leftLowCut.template setBypassed<2>(false);
+        *leftLowCut.template get<3>().coefficients = *cutCoefficients[3];
+        leftLowCut.template setBypassed<3>(false);
         break;
     }
 }
 
 
+#pragma endregion
 
 //==============================================================================
 // This creates new instances of the plugin..
