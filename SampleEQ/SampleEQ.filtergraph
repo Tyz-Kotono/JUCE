@@ -65,7 +65,7 @@
           uiLastY_Normal="814" uiopen_Normal="0">
     <PLUGIN name="SampleEQ" format="VST3" category="Fx" manufacturer="yourcompany"
             version="1.0.0" file="G:\JUCE\Program\SampleEQ\Builds\VisualStudio2022\x64\Debug\VST3\SampleEQ.vst3\Contents\x86_64-win\SampleEQ.vst3"
-            uniqueId="f1a1e426" isInstrument="0" fileTime="19667824e3f" infoUpdateTime="1966af0e8c0"
+            uniqueId="f1a1e426" isInstrument="0" fileTime="1966c1c353c" infoUpdateTime="1966c1d7ea7"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95309ad"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
@@ -82,7 +82,7 @@
           uiLastY_Normal="775" uiopen_Normal="0">
     <PLUGIN name="AudioFilePlayer" format="VST3" category="Fx" manufacturer="Matkat Music LLC"
             version="1.0.0" file="C:\Program Files\Common Files\VST3\AudioFilePlayer.vst3\Contents\x86_64-win\AudioFilePlayer.vst3"
-            uniqueId="79fe81c" isInstrument="0" fileTime="19666a4d429" infoUpdateTime="1966af0e8c0"
+            uniqueId="79fe81c" isInstrument="0" fileTime="19666a4d429" infoUpdateTime="1966c1d7ea7"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95d02c7"/>
     <STATE>340.VMjLgrT....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9DyMw3BTIISX1UEaho2ZVkUdAAkKAwDUigWRWkEcQ0VTucmUY4BQ1QUQholSh0DQgUWUGkUSUIiXu0jQW01UKoFaxPSao8DRpk1SyHWZOgEZlomPHs1JKwVZKgTZocjauk1RHcVZKgEZocjavk1QHclYlIESu4BdVwVYI4FaxLSaloVNvgEZNMmarkyYOEyZKw1cVgUZA4hKt3hKt3hKt3hKtXlTU0DUQAURWoULEYzXqEEUXoWQF4RPDYFTzDzUXkWSG4RPDYmKtnWPt3hKt3hKt3hKJUELPUTPqI1aYcEV5UkQQcVTWgEOujzPu0Fbu4VYtQmO77hUSQ0LPwVcmklaSQWXzUlO..</STATE>

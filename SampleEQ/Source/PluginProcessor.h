@@ -114,12 +114,12 @@ private:
     void Update(ChainType& Chain, const CoefficientType& coefficients);
 
     template <typename ChainType, typename CoefficientType>
-    void UpdateCutFilter(ChainType& leftLowCut,
-                         const CoefficientType& cutCoefficients,
-                         // const ChainSettings& chainSettings,
-                         const Slope& lowCutSlope
-    );
+    void UpdateCutFilter(ChainType& leftLowCut,const CoefficientType& cutCoefficients,const Slope& lowCutSlope);
 
 
+    void UpdateFilters();
+    void UpdateHighCutFilters(const ChainSettings& chainSettings);
+    void UpdateLowCutFilters(const ChainSettings& chainSettings);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };
