@@ -167,7 +167,7 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 
     // LowCut Butterworth Highpass
     UpdateIIRHighpassHigh(chainSetting);
-    auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+    auto LowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
     (
         chainSetting.lowCutFreq,
         getSampleRate(),
@@ -177,8 +177,8 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
     auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
 
-    UpdateCutFilter(leftLowCut, CutCoefficients, chainSetting.LowCutSlope);
-    UpdateCutFilter(rightLowCut, CutCoefficients, chainSetting.LowCutSlope);
+    UpdateCutFilter(leftLowCut, LowCutCoefficients, chainSetting.LowCutSlope);
+    UpdateCutFilter(rightLowCut, LowCutCoefficients, chainSetting.LowCutSlope);
 
 
     juce::dsp::AudioBlock<float> block(buffer);
@@ -358,46 +358,36 @@ void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter, ChainSet
 }
 
 
+template <int Index, typename ChainType, typename CoefficientType>
+void SampleEQAudioProcessor::Update(ChainType& Chain, const CoefficientType& coefficients)
+{
+    UpdateCoefficients(Chain.template get<Index>().coefficients, coefficients[Index]);
+    Chain.template setBypassed<Index>(false);
+}
+
 template <typename ChainType, typename CoefficientType>
-void SampleEQAudioProcessor::UpdateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficients,
-                                             const Slope& lowCutSlope)
+void SampleEQAudioProcessor::UpdateCutFilter(ChainType& Chain, const CoefficientType& coefficients,
+                                             const Slope& slope)
 {
     //Close all Filter, single don't working
-    leftLowCut.template setBypassed<0>(true);
-    leftLowCut.template setBypassed<1>(true);
-    leftLowCut.template setBypassed<2>(true);
-    leftLowCut.template setBypassed<3>(true);
+    Chain.template setBypassed<0>(true);
+    Chain.template setBypassed<1>(true);
+    Chain.template setBypassed<2>(true);
+    Chain.template setBypassed<3>(true);
 
-    switch (lowCutSlope)
+    switch (slope)
     {
     case Slope_12:
-        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-        leftLowCut.template setBypassed<0>(false);
+        Update<0>(Chain, coefficients);
         break;
     case Slope_24:
-        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-        leftLowCut.template setBypassed<0>(false);
-        *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-        leftLowCut.template setBypassed<1>(false);
+        Update<1>(Chain, coefficients);
         break;
     case Slope_36:
-        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-        leftLowCut.template setBypassed<0>(false);
-        *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-        leftLowCut.template setBypassed<1>(false);
-        *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
-        leftLowCut.template setBypassed<2>(false);
-
+        Update<2>(Chain, coefficients);
         break;
     case Slope_48:
-        *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-        leftLowCut.template setBypassed<0>(false);
-        *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-        leftLowCut.template setBypassed<1>(false);
-        *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
-        leftLowCut.template setBypassed<2>(false);
-        *leftLowCut.template get<3>().coefficients = *cutCoefficients[3];
-        leftLowCut.template setBypassed<3>(false);
+        Update<3>(Chain, coefficients);
         break;
     }
 }
