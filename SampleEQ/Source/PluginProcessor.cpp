@@ -105,70 +105,14 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     rightChain.prepare(spec);
 
     auto chainSetting = getChainSettings(apvts);
-
-    auto peakCoefficients =
-        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            sampleRate,
-            chainSetting.peakFreq,
-            chainSetting.peakQuality,
-            juce::Decibels::decibelsToGain(chainSetting.peakGainInDecibels)
-        );
-
-
-    //Single Filter
-    *leftChain.get<ChainPosition::Peak>().coefficients = *peakCoefficients;
-    *rightChain.get<ChainPosition::Peak>().coefficients = *peakCoefficients;
-
-
-    //
-    auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
-    (
-        chainSetting.lowCutFreq,
-        sampleRate,
-        2 * (chainSetting.LowCutSlope + 1)
-    );
-
-    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
-    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
-    IIRHighpassCutFilter(leftLowCut, chainSetting, CutCoefficients);
-    IIRHighpassCutFilter(rightLowCut, chainSetting, CutCoefficients);
-    // leftLowCut.setBypassed<0>(true);
-    // leftLowCut.setBypassed<1>(true);
-    // leftLowCut.setBypassed<2>(true);
-    // leftLowCut.setBypassed<3>(true);
-    //
-    // switch (chainSetting.LowCutSlope)
-    // {
-    // case Slope_12:
-    //     *leftLowCut.get<0>().coefficients = *CutCoefficients[0];
-    //     leftLowCut.setBypassed<0>(false);
-    //     break;
-    // case Slope_24:
-    //     *leftLowCut.get<0>().coefficients = *CutCoefficients[0];
-    //     leftLowCut.setBypassed<0>(false);
-    //     *leftLowCut.get<1>().coefficients = *CutCoefficients[1];
-    //     leftLowCut.setBypassed<1>(false);
-    //     break;
-    // case Slope_36:
-    //     *leftLowCut.get<0>().coefficients = *CutCoefficients[0];
-    //     leftLowCut.setBypassed<0>(false);
-    //     *leftLowCut.get<1>().coefficients = *CutCoefficients[1];
-    //     leftLowCut.setBypassed<1>(false);
-    //     *leftLowCut.get<2>().coefficients = *CutCoefficients[2];
-    //     leftLowCut.setBypassed<2>(false);
-    //
-    //     break;
-    // case Slope_48:
-    //     *leftLowCut.get<0>().coefficients = *CutCoefficients[0];
-    //     leftLowCut.setBypassed<0>(false);
-    //     *leftLowCut.get<1>().coefficients = *CutCoefficients[1];
-    //     leftLowCut.setBypassed<1>(false);
-    //     *leftLowCut.get<2>().coefficients = *CutCoefficients[2];
-    //     leftLowCut.setBypassed<2>(false);
-    //     *leftLowCut.get<3>().coefficients = *CutCoefficients[3];
-    //     leftLowCut.setBypassed<3>(false);
-    //     break;
-    // }
+    
+    // Single Filter
+    UpdatePeakFilter(chainSetting);
+    
+    // LowCut Butterworth Highpass
+    UpdateIIRHighpassHigh(chainSetting);
+  
+ 
 }
 
 void SampleEQAudioProcessor::releaseResources()
@@ -219,32 +163,13 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
         buffer.clear(i, 0, buffer.getNumSamples());
 
     auto chainSetting = getChainSettings(apvts);
+    
+    // Single Filter
+    UpdatePeakFilter(chainSetting);
 
-    auto peakCoefficients =
-        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            getSampleRate(),
-            chainSetting.peakFreq,
-            chainSetting.peakQuality,
-            juce::Decibels::decibelsToGain(chainSetting.peakGainInDecibels)
-        );
-
-    //Single Filter
-    *leftChain.get<ChainPosition::Peak>().coefficients = *peakCoefficients;
-    *rightChain.get<ChainPosition::Peak>().coefficients = *peakCoefficients;
-
-
-    auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
-    (
-        chainSetting.lowCutFreq,
-        getSampleRate(),
-        2 * (chainSetting.LowCutSlope + 1)
-    );
-
-    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
-    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
-    IIRHighpassCutFilter(leftLowCut, chainSetting, CutCoefficients);
-    IIRHighpassCutFilter(rightLowCut, chainSetting, CutCoefficients);
-
+    // LowCut Butterworth Highpass
+    UpdateIIRHighpassHigh(chainSetting);
+    
 
     juce::dsp::AudioBlock<float> block(buffer);
 
@@ -375,6 +300,42 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
     return layout;
 }
 
+void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings)
+{
+    auto peakCoefficients =
+          juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+              getSampleRate(),
+              chainSettings.peakFreq,
+              chainSettings.peakQuality,
+              juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+          );
+
+    //Single Filter
+    UpdateCoefficients(leftChain.get<ChainPosition::Peak>().coefficients,peakCoefficients);
+    UpdateCoefficients(rightChain.get<ChainPosition::Peak>().coefficients,peakCoefficients);
+}
+
+void SampleEQAudioProcessor::UpdateCoefficients(Coefficients& old, const Coefficients& replacements)
+{
+    // *ptr& 
+    *old = *replacements;
+}
+
+void SampleEQAudioProcessor::UpdateIIRHighpassHigh(const ChainSettings& chainSettings)
+{
+    auto CutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+  (
+      chainSettings.lowCutFreq,
+      getSampleRate(),
+      2 * (chainSettings.LowCutSlope + 1)
+  );
+    
+    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
+    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
+    IIRHighpassCutFilter(leftLowCut, chainSettings, CutCoefficients);
+    IIRHighpassCutFilter(rightLowCut, chainSettings, CutCoefficients);
+}
+
 void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter, ChainSettings Setting,
                                                   juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>>
                                                   CutCoefficients)
@@ -418,6 +379,8 @@ void SampleEQAudioProcessor::IIRHighpassCutFilter(CutFilter& CutFilter, ChainSet
         break;
     }
 }
+
+
 
 //==============================================================================
 // This creates new instances of the plugin..

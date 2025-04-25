@@ -82,8 +82,6 @@ public:
         CreateParameterLayout(),
     };
 
-  
-    
 private:
     //==============================================================================
 
@@ -94,6 +92,9 @@ private:
 
     MonoChain leftChain, rightChain;
 
+
+  
+
     enum ChainPosition
     {
         LowCut,
@@ -101,7 +102,17 @@ private:
         HighCut
     };
 
-    void IIRHighpassCutFilter(CutFilter& CutFilter,ChainSettings Setting, juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>> CutCoefficients);
+
+    //Single Filter
+    void UpdatePeakFilter(const ChainSettings& chainSettings);
+    using Coefficients = Filter::CoefficientsPtr;
+    static void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
+
+    //IIR
+    void UpdateIIRHighpassHigh(const ChainSettings& chainSettings);
+    void IIRHighpassCutFilter(CutFilter& CutFilter, ChainSettings Setting,
+                              juce::ReferenceCountedArray<juce::dsp::IIR::Coefficients<float>> CutCoefficients);
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };
