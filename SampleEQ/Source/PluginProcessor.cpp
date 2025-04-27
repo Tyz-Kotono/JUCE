@@ -11,6 +11,73 @@
 #include "pluginterfaces/vst/vsttypes.h"
 
 
+#pragma region publicFunction
+
+template <int Index, typename ChainType, typename CoefficientType>
+void Update(ChainType& Chain, const CoefficientType& coefficients)
+{
+    UpdateCoefficients(Chain.template get<Index>().coefficients, coefficients[Index]);
+    Chain.template setBypassed<Index>(false);
+}
+
+template <typename ChainType, typename CoefficientType>
+void UpdateCutFilter(ChainType& Chain, const CoefficientType& coefficients,
+                     const Slope& slope)
+{
+    //Close all Filter, single don't working
+    Chain.template setBypassed<0>(true);
+    Chain.template setBypassed<1>(true);
+    Chain.template setBypassed<2>(true);
+    Chain.template setBypassed<3>(true);
+
+    switch (slope)
+    {
+    case Slope_12: Update<0>(Chain, coefficients);
+        break;
+    case Slope_24: Update<1>(Chain, coefficients);
+        break;
+    case Slope_36: Update<2>(Chain, coefficients);
+        break;
+    case Slope_48: Update<3>(Chain, coefficients);
+        break;
+    }
+}
+
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
+{
+    return
+        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            sampleRate,
+            chainSettings.peakFreq,
+            chainSettings.peakQuality,
+            juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+        );
+}
+
+
+auto makeLowCutFilters(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+    (
+        chainSettings.lowCutFreq,
+        sampleRate,
+        2 * (chainSettings.LowCutSlope + 1)
+    );
+}
+
+auto makeHighCutFilters(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
+    (
+        chainSettings.highCutFreq,
+        sampleRate,
+        2 * (chainSettings.HighCutSlope + 1)
+    );
+}
+
+
+#pragma endregion
+
 
 //==============================================================================
 SampleEQAudioProcessor::SampleEQAudioProcessor()
@@ -105,7 +172,7 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
 
     leftChain.prepare(spec);
     rightChain.prepare(spec);
-    
+
     // Low High Cut Butterworth Highpass
     UpdateFilters();
 }
@@ -156,14 +223,12 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
-    
-    // Low High Cut Butterworth Highpass
-    
-    UpdateFilters();
-   
-    
 
-    
+    // Low High Cut Butterworth Highpass
+
+    UpdateFilters();
+
+
     juce::dsp::AudioBlock<float> block(buffer);
 
     auto leftBlock = block.getSingleChannelBlock(0);
@@ -198,7 +263,7 @@ bool SampleEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* SampleEQAudioProcessor::createEditor()
 {
-    return new SampleEQAudioProcessorEditor (*this);
+    return new SampleEQAudioProcessorEditor(*this);
     // return new juce::GenericAudioProcessorEditor(*this);
 }
 
@@ -208,7 +273,7 @@ void SampleEQAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-    juce::MemoryOutputStream mos(destData,true);
+    juce::MemoryOutputStream mos(destData, true);
     apvts.state.writeToStream(mos);
 }
 
@@ -216,8 +281,8 @@ void SampleEQAudioProcessor::setStateInformation(const void* data, int sizeInByt
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-    auto tree = juce::ValueTree::readFromData(data,sizeInBytes);
-    if(tree.isValid())
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if (tree.isValid())
     {
         apvts.replaceState(tree);
         UpdateFilters();
@@ -311,28 +376,36 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
 
 #pragma region Single Peak
 
-Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
-{
-    return 
-        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            sampleRate,
-            chainSettings.peakFreq,
-            chainSettings.peakQuality,
-            juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
-        );
-}
-
 
 void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings)
 {
     auto peakCoefficients = makePeakFilter(chainSettings, getSampleRate());
-    
+
     //Single Filter
     UpdateCoefficients(leftChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
     UpdateCoefficients(rightChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
 }
 
+void SampleEQAudioProcessor::UpdateHighCutFilters(const ChainSettings& chainSettings)
+{
+    auto HighCutCoefficients = makeHighCutFilters(chainSettings, getSampleRate());
+    auto& leftHighCut = leftChain.get<ChainPosition::HighCut>();
+    auto& rightHighCut = rightChain.get<ChainPosition::HighCut>();
 
+    UpdateCutFilter(leftHighCut, HighCutCoefficients, chainSettings.HighCutSlope);
+    UpdateCutFilter(rightHighCut, HighCutCoefficients, chainSettings.HighCutSlope);
+}
+
+void SampleEQAudioProcessor::UpdateLowCutFilters(const ChainSettings& chainSettings)
+{
+    auto LowCutCoefficients = makeLowCutFilters(chainSettings, getSampleRate());
+
+    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
+    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
+
+    UpdateCutFilter(leftLowCut, LowCutCoefficients, chainSettings.LowCutSlope);
+    UpdateCutFilter(rightLowCut, LowCutCoefficients, chainSettings.LowCutSlope);
+}
 
 
 #pragma endregion
@@ -350,75 +423,8 @@ void SampleEQAudioProcessor::UpdateFilters()
     UpdateLowCutFilters(chainSettings);
 }
 
-void SampleEQAudioProcessor::UpdateHighCutFilters(const ChainSettings& chainSettings)
-{
-    auto HighCutCoefficients =
-     juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
- (
-     chainSettings.highCutFreq,
-     getSampleRate(),
-     2 * (chainSettings.HighCutSlope + 1)
- );
-
-    auto& leftHighCut = leftChain.get<ChainPosition::HighCut>();
-    auto& rightHighCut = rightChain.get<ChainPosition::HighCut>();
-
-    UpdateCutFilter(leftHighCut, HighCutCoefficients, chainSettings.HighCutSlope);
-    UpdateCutFilter(rightHighCut, HighCutCoefficients, chainSettings.HighCutSlope);
-
-}
-
-void SampleEQAudioProcessor::UpdateLowCutFilters(const ChainSettings& chainSettings)
-{
-    auto LowCutCoefficients =
-     juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
- (
-     chainSettings.lowCutFreq,
-     getSampleRate(),
-     2 * (chainSettings.LowCutSlope + 1)
- );
-
-    auto& leftLowCut = leftChain.get<ChainPosition::LowCut>();
-    auto& rightLowCut = rightChain.get<ChainPosition::LowCut>();
-
-    UpdateCutFilter(leftLowCut, LowCutCoefficients, chainSettings.LowCutSlope);
-    UpdateCutFilter(rightLowCut, LowCutCoefficients, chainSettings.LowCutSlope);
-}
-
-
-template <int Index, typename ChainType, typename CoefficientType>
-void SampleEQAudioProcessor::Update(ChainType& Chain, const CoefficientType& coefficients)
-{
-    UpdateCoefficients(Chain.template get<Index>().coefficients, coefficients[Index]);
-    Chain.template setBypassed<Index>(false);
-}
-
-template <typename ChainType, typename CoefficientType>
-void SampleEQAudioProcessor::UpdateCutFilter(ChainType& Chain, const CoefficientType& coefficients,
-                                             const Slope& slope)
-{
-    //Close all Filter, single don't working
-    Chain.template setBypassed<0>(true);
-    Chain.template setBypassed<1>(true);
-    Chain.template setBypassed<2>(true);
-    Chain.template setBypassed<3>(true);
-
-    switch (slope)
-    {
-    case Slope_12: Update<0>(Chain, coefficients);
-        break; 
-    case Slope_24: Update<1>(Chain, coefficients);
-        break; 
-    case Slope_36: Update<2>(Chain, coefficients);
-        break; 
-    case Slope_48: Update<3>(Chain, coefficients);
-        break; 
-    }
-}
 
 #pragma endregion
-
-
 
 
 //==============================================================================

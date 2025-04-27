@@ -44,9 +44,26 @@ enum ChainPosition
 };
 
 using Coefficients = Filter::CoefficientsPtr;
-void UpdateCoefficients(Coefficients& old, const Coefficients& replacements) ;
 
-Coefficients makePeakFilter(const ChainSettings& chainSettings,double sampleRate);
+
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate);
+void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
+
+//Single Frequency 
+
+//Low High Cut
+template <int Index, typename ChainType, typename CoefficientType>
+void Update(ChainType& Chain, const CoefficientType& coefficients);
+
+template <typename ChainType, typename CoefficientType>
+void UpdateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficients, const Slope& lowCutSlope);
+
+inline auto makeLowCutFilters(const ChainSettings& chainSettings,  double sampleRate);
+inline auto makeHighCutFilters(const ChainSettings& chainSettings, double sampleRate);
+
+
+
+
 //==============================================================================
 /**
 */
@@ -107,22 +124,13 @@ private:
 
     MonoChain leftChain, rightChain;
 
+    void UpdateFilters();
+    
     //Single Filter
     void UpdatePeakFilter(const ChainSettings& chainSettings);
-  
-
-
-    //Low High Cut
-    template <int Index, typename ChainType, typename CoefficientType>
-    void Update(ChainType& Chain, const CoefficientType& coefficients);
-
-    template <typename ChainType, typename CoefficientType>
-    void UpdateCutFilter(ChainType& leftLowCut,const CoefficientType& cutCoefficients,const Slope& lowCutSlope);
-
-
-    void UpdateFilters();
+    
     void UpdateHighCutFilters(const ChainSettings& chainSettings);
     void UpdateLowCutFilters(const ChainSettings& chainSettings);
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };
