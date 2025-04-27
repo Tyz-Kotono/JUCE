@@ -11,17 +11,26 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+struct CustomRotarySlider : juce::Slider
+{
+    CustomRotarySlider() : juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,
+                                        juce::Slider::TextEntryBoxPosition::NoTextBox)
+    {
+    }
+};
+
+
 //==============================================================================
 /**
 */
-class SampleEQAudioProcessorEditor  : public juce::AudioProcessorEditor
+class SampleEQAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    SampleEQAudioProcessorEditor (SampleEQAudioProcessor&);
+    SampleEQAudioProcessorEditor(SampleEQAudioProcessor&);
     ~SampleEQAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint(juce::Graphics&) override;
     void resized() override;
 
 private:
@@ -29,5 +38,11 @@ private:
     // access the processor object that created it.
     SampleEQAudioProcessor& audioProcessor;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleEQAudioProcessorEditor)
+    CustomRotarySlider peakFreqSlider, peakGainSlider, peakQualitySlider;
+    CustomRotarySlider lowCutFreqSlider, lowCutSlopeSlider, highCutFreqSlider, highCutSlopeSlider;
+
+    std::vector<juce::Component*> GetComps();
+
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessorEditor)
 };
