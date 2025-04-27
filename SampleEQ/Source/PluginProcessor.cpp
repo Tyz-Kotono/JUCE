@@ -43,38 +43,6 @@ void UpdateCutFilter(ChainType& Chain, const CoefficientType& coefficients,
     }
 }
 
-Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
-{
-    return
-        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            sampleRate,
-            chainSettings.peakFreq,
-            chainSettings.peakQuality,
-            juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
-        );
-}
-
-
-auto makeLowCutFilters(const ChainSettings& chainSettings, double sampleRate)
-{
-    return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
-    (
-        chainSettings.lowCutFreq,
-        sampleRate,
-        2 * (chainSettings.LowCutSlope + 1)
-    );
-}
-
-auto makeHighCutFilters(const ChainSettings& chainSettings, double sampleRate)
-{
-    return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
-    (
-        chainSettings.highCutFreq,
-        sampleRate,
-        2 * (chainSettings.HighCutSlope + 1)
-    );
-}
-
 
 #pragma endregion
 

@@ -46,7 +46,7 @@ enum ChainPosition
 using Coefficients = Filter::CoefficientsPtr;
 
 
-Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate);
+
 void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
 
 //Single Frequency 
@@ -58,8 +58,36 @@ void Update(ChainType& Chain, const CoefficientType& coefficients);
 template <typename ChainType, typename CoefficientType>
 void UpdateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficients, const Slope& lowCutSlope);
 
-inline auto makeLowCutFilters(const ChainSettings& chainSettings,  double sampleRate);
-inline auto makeHighCutFilters(const ChainSettings& chainSettings, double sampleRate);
+
+inline Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
+{
+    return
+       juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+           sampleRate,
+           chainSettings.peakFreq,
+           chainSettings.peakQuality,
+           juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+       );
+}
+
+inline auto makeLowCutFilters(const ChainSettings& chainSettings,  double sampleRate)
+{
+    return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
+    (
+        chainSettings.lowCutFreq,
+        sampleRate,
+        2 * (chainSettings.LowCutSlope + 1)
+    );
+}
+inline auto makeHighCutFilters(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
+  (
+      chainSettings.highCutFreq,
+      sampleRate,
+      2 * (chainSettings.HighCutSlope + 1)
+  );
+}
 
 
 
