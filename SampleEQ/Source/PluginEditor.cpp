@@ -165,3 +165,23 @@ std::vector<juce::Component*> SampleEQAudioProcessorEditor::GetComps()
         &highCutSlopeSlider
     };
 }
+
+void SampleEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
+{
+    parametersChanged.set(true);
+}
+void SampleEQAudioProcessorEditor::timerCallback()
+{
+    if(parametersChanged.compareAndSetBool(false,true))
+    {
+        // Update momo chain
+        //single a repaint
+    }
+}
+
+
+
+void SampleEQAudioProcessorEditor::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
+{
+}
+

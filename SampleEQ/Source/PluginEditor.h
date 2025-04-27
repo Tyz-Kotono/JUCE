@@ -23,7 +23,9 @@ struct CustomRotarySlider : juce::Slider
 //==============================================================================
 /**
 */
-class SampleEQAudioProcessorEditor : public juce::AudioProcessorEditor
+class SampleEQAudioProcessorEditor : public juce::AudioProcessorEditor,
+                                     public juce::AudioProcessorParameter::Listener,
+                                     public juce::Timer
 {
 public:
     SampleEQAudioProcessorEditor(SampleEQAudioProcessor&);
@@ -33,10 +35,15 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
+   
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SampleEQAudioProcessor& audioProcessor;
+
+    juce::Atomic<bool> parametersChanged{false};
+
+    MonoChain monoChain;
 
     CustomRotarySlider
         peakFreqSlider,
@@ -61,7 +68,14 @@ private:
 
     std::vector<juce::Component*> GetComps();
 
-    MonoChain monoChain;
+
+    //Call back
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+
+    void timerCallback() override;
+
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessorEditor)
 };

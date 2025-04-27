@@ -10,6 +10,8 @@
 #include "PluginEditor.h"
 #include "pluginterfaces/vst/vsttypes.h"
 
+
+
 //==============================================================================
 SampleEQAudioProcessor::SampleEQAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -303,22 +305,28 @@ juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::Crea
 
 #pragma region Single Peak
 
-void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings)
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
 {
-    auto peakCoefficients =
+    return 
         juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            getSampleRate(),
+            sampleRate,
             chainSettings.peakFreq,
             chainSettings.peakQuality,
             juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
         );
+}
 
+
+void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings)
+{
+    auto peakCoefficients = makePeakFilter(chainSettings, getSampleRate());
+    
     //Single Filter
     UpdateCoefficients(leftChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
     UpdateCoefficients(rightChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
 }
 
-void SampleEQAudioProcessor::UpdateCoefficients(Coefficients& old, const Coefficients& replacements)
+void UpdateCoefficients(Coefficients& old, const Coefficients& replacements)
 {
     // *ptr& 
     *old = *replacements;
