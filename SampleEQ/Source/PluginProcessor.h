@@ -30,6 +30,19 @@ struct ChainSettings
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
 
+
+//Butterworth Highpass
+using Filter = juce::dsp::IIR::Filter<float>;
+using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+enum ChainPosition
+{
+    LowCut,
+    Peak,
+    HighCut
+};
+
 //==============================================================================
 /**
 */
@@ -87,21 +100,8 @@ public:
 private:
     //==============================================================================
 
-    //Butterworth Highpass
-    using Filter = juce::dsp::IIR::Filter<float>;
-    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
-    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
     MonoChain leftChain, rightChain;
-
-
-    enum ChainPosition
-    {
-        LowCut,
-        Peak,
-        HighCut
-    };
-
 
     //Single Filter
     void UpdatePeakFilter(const ChainSettings& chainSettings);
