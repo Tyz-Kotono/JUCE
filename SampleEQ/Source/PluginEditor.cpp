@@ -30,11 +30,25 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
         addAndMakeVisible(comp);
     }
 
+    const auto& parmas = audioProcessor.getParameters();
+
+    for (auto* param : parmas)
+    {
+        param->addListener(this);
+    }
+
+    startTimerHz(60);
     setSize(400, 300);
 }
 
 SampleEQAudioProcessorEditor::~SampleEQAudioProcessorEditor()
 {
+    const auto& parmas = audioProcessor.getParameters();
+
+    for (auto* param : parmas)
+    {
+        param->removeListener(this);
+    }
 }
 
 //==============================================================================
@@ -64,14 +78,13 @@ void SampleEQAudioProcessorEditor::paint(juce::Graphics& g)
     {
         double mag = 1.0f;
         auto freq = mapToLog10(double(i) / double(W), 20.0, 20000.0);
-    
+
         if (!monoChain.isBypassed<ChainPosition::Peak>())
         {
             mag *= peak.coefficients->getMagnitudeForFrequency(freq, sampleRate);
         }
         if (!lowCut.isBypassed<0>())
         {
-
             mag *= lowCut.get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
         }
         if (!lowCut.isBypassed<1>())
@@ -86,7 +99,7 @@ void SampleEQAudioProcessorEditor::paint(juce::Graphics& g)
         {
             mag *= lowCut.get<3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
         }
-    
+
         if (!highCut.isBypassed<0>())
         {
             mag *= highCut.get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
@@ -103,7 +116,7 @@ void SampleEQAudioProcessorEditor::paint(juce::Graphics& g)
         {
             mag *= highCut.get<3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
         }
-    
+
         mags[i] = Decibels::gainToDecibels(mag);
     }
 
@@ -170,18 +183,24 @@ void SampleEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, flo
 {
     parametersChanged.set(true);
 }
+
 void SampleEQAudioProcessorEditor::timerCallback()
 {
-    if(parametersChanged.compareAndSetBool(false,true))
+    if (parametersChanged.compareAndSetBool(false, true))
     {
         // Update momo chain
+
+        DBG("Params changer");
+        auto chainSettings = getChainSettings(audioProcessor.apvts);
+        auto peakCoefficients = makePeakFilter(chainSettings,audioProcessor.getSampleRate());
+        UpdateCoefficients(monoChain.get<ChainPosition::Peak>().coefficients,peakCoefficients);
+        
         //single a repaint
+        repaint();
     }
 }
-
 
 
 void SampleEQAudioProcessorEditor::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
 {
 }
-

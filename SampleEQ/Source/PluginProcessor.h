@@ -44,7 +44,7 @@ enum ChainPosition
 };
 
 using Coefficients = Filter::CoefficientsPtr;
-static void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
+void UpdateCoefficients(Coefficients& old, const Coefficients& replacements) ;
 
 Coefficients makePeakFilter(const ChainSettings& chainSettings,double sampleRate);
 //==============================================================================

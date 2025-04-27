@@ -244,6 +244,12 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     return settings;
 }
 
+void UpdateCoefficients(Coefficients& old, const Coefficients& replacements)
+{
+    // *ptr& 
+    *old = *replacements;
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout SampleEQAudioProcessor::CreateParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
@@ -326,11 +332,7 @@ void SampleEQAudioProcessor::UpdatePeakFilter(const ChainSettings& chainSettings
     UpdateCoefficients(rightChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
 }
 
-void UpdateCoefficients(Coefficients& old, const Coefficients& replacements)
-{
-    // *ptr& 
-    *old = *replacements;
-}
+
 
 
 #pragma endregion
