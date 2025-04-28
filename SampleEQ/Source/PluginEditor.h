@@ -19,13 +19,32 @@ struct CustomRotarySlider : juce::Slider
     }
 };
 
+struct ResponseCurveComponent : juce::Component,
+                                juce::AudioProcessorParameter::Listener,
+                                juce::Timer
+{
+    ResponseCurveComponent(SampleEQAudioProcessor&);
+    ~ResponseCurveComponent() override;
+
+    //Call back
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+
+    void timerCallback() override;
+
+    void paint(juce::Graphics&) override;
+
+private:
+    SampleEQAudioProcessor& audioProcessor;
+    juce::Atomic<bool> parametersChanged{false};
+
+    MonoChain monoChain;
+};
 
 //==============================================================================
 /**
 */
-class SampleEQAudioProcessorEditor : public juce::AudioProcessorEditor,
-                                     public juce::AudioProcessorParameter::Listener,
-                                     public juce::Timer
+class SampleEQAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
     SampleEQAudioProcessorEditor(SampleEQAudioProcessor&);
@@ -35,7 +54,6 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
-   
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -43,7 +61,8 @@ private:
 
     juce::Atomic<bool> parametersChanged{false};
 
-    MonoChain monoChain;
+    // MonoChain monoChain;
+    ResponseCurveComponent responseCurveComponent;
 
     CustomRotarySlider
         peakFreqSlider,
@@ -66,15 +85,20 @@ private:
         highCutFreqSliderAttachment,
         highCutSlopeSliderAttachment;
 
-    std::vector<juce::Component*> GetComps();
-
-
-    //Call back
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
-
-    void timerCallback() override;
-
+    std::vector<juce::Component*> GetComps()
+    {
+        return
+        {
+            &peakFreqSlider,
+            &peakGainSlider,
+            &peakQualitySlider,
+            &lowCutFreqSlider,
+            &lowCutSlopeSlider,
+            &highCutFreqSlider,
+            &highCutSlopeSlider,
+            &responseCurveComponent
+        };
+    }
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessorEditor)

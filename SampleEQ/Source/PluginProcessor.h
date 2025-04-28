@@ -28,7 +28,7 @@ struct ChainSettings
     Slope LowCutSlope{Slope::Slope_12}, HighCutSlope{Slope::Slope_12};
 };
 
-ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
+
 
 
 //Butterworth Highpass
@@ -45,11 +45,10 @@ enum ChainPosition
 
 using Coefficients = Filter::CoefficientsPtr;
 
-
-
-void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
 
 //Single Frequency 
+void UpdateCoefficients(Coefficients& old, const Coefficients& replacements);
 
 //Low High Cut
 template <int Index, typename ChainType, typename CoefficientType>
@@ -58,6 +57,10 @@ void Update(ChainType& Chain, const CoefficientType& coefficients);
 template <typename ChainType, typename CoefficientType>
 void UpdateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficients, const Slope& lowCutSlope);
 
+
+//Filter
+
+#pragma region Filter for Frequency
 
 inline Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
 {
@@ -88,6 +91,8 @@ inline auto makeHighCutFilters(const ChainSettings& chainSettings, double sample
       2 * (chainSettings.HighCutSlope + 1)
   );
 }
+
+#pragma endregion 
 
 
 
