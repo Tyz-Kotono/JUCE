@@ -11,11 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-// #include "juce_gui_basics/widgets/juce_Slider.h"
-#include "PluginProcessor.h"
-//==============================================================================
-/*
-*/
+
 
 struct LookAndFeel : juce::LookAndFeel_V4
 {
@@ -25,7 +21,7 @@ public:
                           float sliderPosProportional,
                           float rotaryStartAngle,
                           float rotaryEndAngle,
-                          juce::Slider&) override{}
+                          juce::Slider&) override;
 };
 
 struct RotarySliderWithLabels : juce::Slider
