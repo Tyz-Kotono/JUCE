@@ -62,14 +62,14 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& graphics, int x, int y, int w
         auto text = rswl->GetDisplayString();
         auto strWidth = graphics.getCurrentFont().getStringWidth(text);
 
-        r.setSize(strWidth,rswl->getTextHeight() + 2);
+        r.setSize(strWidth, rswl->getTextHeight() + 2);
         r.setCentre(bounds.getCentre());
 
         graphics.setColour(Colours::black);
         graphics.fillRect(r);
 
         graphics.setColour(Colours::white);
-        graphics.drawFittedText(text,r.toNearestInt(),juce::Justification::centred,1);
+        graphics.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
 
@@ -121,5 +121,37 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 
 juce::String RotarySliderWithLabels::GetDisplayString() const
 {
-    return juce::String(getValue());
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(param))
+    {
+        return choiceParam->getCurrentChoiceName();
+    }
+    juce::String str;
+    bool addK = false;
+
+    if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param))
+    {
+        float val = getValue();
+        if (val > 999.f)
+        {
+            val /= 1000.0f;
+            addK = true;
+        }
+
+        str = juce::String(val, (addK) ? 2 : 0);
+    }
+    else
+    {
+        jassertfalse;
+    }
+
+    if (suffix.isNotEmpty())
+    {
+        str << " ";
+        if (addK)
+            str << "K";
+
+        str << suffix;
+    }
+
+    return str;
 }
