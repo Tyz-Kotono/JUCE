@@ -43,13 +43,14 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& graphics, int x, int y, int w
 
     //check
     jassert(rotaryStartAngle < rotaryEndAngle);
+    //Map to the Angle range (radian system) based on the slider ratio value
     auto sliderAngRad = jmap(sliderPosProportional,
                              0.f, 1.f,
                              rotaryStartAngle, rotaryEndAngle);
 
-    p.applyTransform(AffineTransform().rotated(sliderAngRad,center.getX(),center.getY()));
+    //Angle Pivot
+    p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
     graphics.fillPath(p);
-    
 }
 
 void RotarySliderWithLabels::paint(juce::Graphics& g)
@@ -61,6 +62,10 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto range = getRange();
     auto sliderBounds = getSliderBounds();
 
+    g.setColour(Colours::red);
+    g.drawRect(getLocalBounds());
+    g.setColour(Colours::yellow);
+    g.drawRect(sliderBounds);
 
     getLookAndFeel().
         drawRotarySlider(g,
@@ -81,5 +86,15 @@ void RotarySliderWithLabels::resized()
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 {
-    return getLocalBounds();
+    // return getLocalBounds();
+    auto bounds = getLocalBounds();
+    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
+
+    size -= getTextHeight() * 2;
+    juce::Rectangle<int> rect;
+    rect.setSize(size,size);
+    
+    rect.setCentre(bounds.getCentreX(),0);
+    rect.setY(2);
+    return rect;
 }
