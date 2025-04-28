@@ -10,14 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-
-struct CustomRotarySlider : juce::Slider
-{
-    CustomRotarySlider() : juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,
-                                        juce::Slider::TextEntryBoxPosition::NoTextBox)
-    {
-    }
-};
+#include "RotarySliderWithLabels.h"
 
 struct ResponseCurveComponent : juce::Component,
                                 juce::AudioProcessorParameter::Listener,
@@ -64,7 +57,7 @@ private:
     // MonoChain monoChain;
     ResponseCurveComponent responseCurveComponent;
 
-    CustomRotarySlider
+    RotarySliderWithLabels
         peakFreqSlider,
         peakGainSlider,
         peakQualitySlider,

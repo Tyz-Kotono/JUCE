@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="Wb9kXP" name="SampleEQ">
     <GROUP id="{294BD698-11E0-3176-DDD1-129562986479}" name="Source">
+      <FILE id="QMs1aW" name="RotarySliderWithLabels.cpp" compile="1" resource="0"
+            file="Source/RotarySliderWithLabels.cpp"/>
+      <FILE id="ZURBNN" name="RotarySliderWithLabels.h" compile="0" resource="0"
+            file="Source/RotarySliderWithLabels.h"/>
       <FILE id="IlhVM6" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="fgF7H8" name="PluginProcessor.h" compile="0" resource="0"
