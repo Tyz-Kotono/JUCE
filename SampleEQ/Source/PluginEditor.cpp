@@ -73,7 +73,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
     // g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(Colours::black);
-    g.drawImage(background,getLocalBounds().toFloat());
+    g.drawImage(background, getLocalBounds().toFloat());
 
 
     // auto responseArea = getLocalBounds();
@@ -173,7 +173,7 @@ void ResponseCurveComponent::resized()
     background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
     Graphics g(background);
 
-    Array<float> freqs{20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 4000, 5000, 10000, 20000};
+    Array<float> freqs{20, /*30, 40,*/ 50, 100, 200, /*300, 400,*/ 500, 1000, 2000, /*4000, */5000, 10000, 20000};
 
     //Draw Line
 
@@ -187,7 +187,7 @@ void ResponseCurveComponent::resized()
     Array<float> xs;
     for (auto f : freqs)
     {
-        auto normX = mapFromLog10(f, 20.f, 2000.0f);
+        auto normX = mapFromLog10(f, 20.f, 20000.0f);
         xs.add(left + width * normX);
     }
 
@@ -207,18 +207,54 @@ void ResponseCurveComponent::resized()
     }
 
     g.drawRect(getAnalisisArea());
+
+
+    //Font
+    g.setColour(Colours::lightgrey);
+    const int fontHeight = 10;
+    g.setFont(fontHeight);
+
+    for (int i = 0; i < freqs.size(); ++i)
+    {
+        auto f = freqs[i];
+        auto x = xs[i];
+
+        bool abbK = false;
+        String str;
+        if (f > 999.f)
+        {
+            abbK = true;
+            f /= 1000.0f;
+        }
+        str << f;
+        if (abbK)
+            str << "k";
+        str << "Hz";
+
+
+        // box
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+        juce::Rectangle<int> r;
+
+        r.setSize(textWidth, fontHeight);
+        r.setCentre(x, 0);
+        r.setY(1);
+
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
+    }
 }
 
 
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
 {
     auto bounds = getLocalBounds();
-    // bounds.reduce(JUCE_LIVE_CONSTANT(5),JUCE_LIVE_CONSTANT(3));
-    bounds.reduce(12, 10);
+    // bounds.reduce(JUCE_LIVE_CONSTANT(5),JUCE_LIVE_CONSTANT(13));
+    // bounds.reduce(12, 10);
     bounds.removeFromTop(12);
-    bounds.removeFromBottom(2);
-    bounds.removeFromLeft(20);
-    bounds.removeFromRight(20);
+    bounds.removeFromBottom(4);
+    bounds.removeFromLeft(12);
+    bounds.removeFromRight(12);
     return bounds;
 }
 
@@ -266,7 +302,7 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
         addAndMakeVisible(comp);
     }
 
-    setSize(400, 300);
+    setSize(600, 400);
 }
 
 SampleEQAudioProcessorEditor::~SampleEQAudioProcessorEditor()
