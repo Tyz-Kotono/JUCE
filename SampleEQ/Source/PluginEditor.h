@@ -35,6 +35,8 @@ private:
     void UpdateChain();
 
     juce::Image background;
+    juce::Rectangle<int> getRenderArea();
+    juce::Rectangle<int> getAnalisisArea();
 };
 
 //==============================================================================

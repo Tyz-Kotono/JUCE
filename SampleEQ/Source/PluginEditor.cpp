@@ -73,12 +73,14 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
     // g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(Colours::black);
-    g.drawImage(background,getLocalBounds().toFloat());
+    // g.drawImage(background,getLocalBounds().toFloat());
 
+  
+
+    // auto responseArea = getLocalBounds();
+    //limit line
+    auto responseArea =   getRenderArea();
     
-
-    auto responseArea = getLocalBounds();
-
     auto W = responseArea.getWidth();
     auto H = responseArea.getHeight();
 
@@ -183,8 +185,26 @@ void ResponseCurveComponent::resized()
         auto y = jmap(gDb,-24.0f,24.0f,float(getHeight()),0.0f);
         g.drawHorizontalLine(y,0,getWidth());
     }
+
+    // g.drawRect(getRenderArea());
 }
 
+
+juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
+{
+    auto bounds = getLocalBounds();
+    // bounds.reduce(JUCE_LIVE_CONSTANT(5),JUCE_LIVE_CONSTANT(3));
+    bounds.reduce(12,10);
+    bounds.removeFromTop(12);
+    bounds.removeFromBottom(2);
+    bounds.removeFromLeft(20);
+    bounds.removeFromRight(20);
+    return  bounds;
+}
+
+juce::Rectangle<int> ResponseCurveComponent::getAnalisisArea()
+{
+}
 
 //==============================================================================
 SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcessor& p)
