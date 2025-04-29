@@ -214,6 +214,7 @@ void ResponseCurveComponent::resized()
     const int fontHeight = 10;
     g.setFont(fontHeight);
 
+    //frequency
     for (int i = 0; i < freqs.size(); ++i)
     {
         auto f = freqs[i];
@@ -242,6 +243,31 @@ void ResponseCurveComponent::resized()
         r.setY(1);
 
         g.drawFittedText(str, r, juce::Justification::centred, 1);
+
+
+        //gain
+        for (auto gDb : gains)
+        {
+            auto y = jmap(gDb, -24.0f, 24.0f, float(bottom), float(top));
+
+            String str;
+            if (gDb > 0)
+                str << "+";
+            str << gDb;
+
+            //font
+            auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+            juce::Rectangle<int> r;
+
+            float widthScale = 1.25f; // 宽度为文本的1.5倍
+            r.setSize(textWidth * widthScale, fontHeight);
+            r.setX(getWidth() - r.getWidth());
+            r.setCentre(r.getCentre().x, y);
+
+            g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
+            g.drawFittedText(str, r, juce::Justification::centred, 1);
+        }
     }
 }
 
@@ -253,8 +279,8 @@ juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
     // bounds.reduce(12, 10);
     bounds.removeFromTop(12);
     bounds.removeFromBottom(4);
-    bounds.removeFromLeft(12);
-    bounds.removeFromRight(12);
+    bounds.removeFromLeft(24);
+    bounds.removeFromRight(24);
     return bounds;
 }
 
