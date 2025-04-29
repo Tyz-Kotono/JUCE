@@ -186,3 +186,5 @@ juce::String RotarySliderWithLabels::GetDisplayString() const
 
     return str;
 }
+
+

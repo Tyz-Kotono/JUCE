@@ -19,7 +19,7 @@ ResponseCurveComponent::ResponseCurveComponent(SampleEQAudioProcessor& p) : audi
     {
         param->addListener(this);
     }
-
+    UpdateChain();
     startTimerHz(60);
 }
 
@@ -47,21 +47,25 @@ void ResponseCurveComponent::timerCallback()
     if (parametersChanged.compareAndSetBool(false, true))
     {
         // Update momo chain
-
-        DBG("Params changer");
-        auto chainSettings = getChainSettings(audioProcessor.apvts);
-        auto peakCoefficients = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
-        UpdateCoefficients(monoChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
-
-        auto lowCutCoefficients = makeLowCutFilters(chainSettings, audioProcessor.getSampleRate());
-        auto highCutCoefficients = makeHighCutFilters(chainSettings, audioProcessor.getSampleRate());
-
-        UpdateCutFilter(monoChain.get<LowCut>(), lowCutCoefficients, chainSettings.LowCutSlope);
-        UpdateCutFilter(monoChain.get<HighCut>(), highCutCoefficients, chainSettings.HighCutSlope);
-        //single a repaint
+        UpdateChain();
         repaint();
     }
 }
+
+void ResponseCurveComponent::UpdateChain()
+{
+    auto chainSettings = getChainSettings(audioProcessor.apvts);
+    auto peakCoefficients = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
+    UpdateCoefficients(monoChain.get<ChainPosition::Peak>().coefficients, peakCoefficients);
+
+    auto lowCutCoefficients = makeLowCutFilters(chainSettings, audioProcessor.getSampleRate());
+    auto highCutCoefficients = makeHighCutFilters(chainSettings, audioProcessor.getSampleRate());
+
+    UpdateCutFilter(monoChain.get<LowCut>(), lowCutCoefficients, chainSettings.LowCutSlope);
+    UpdateCutFilter(monoChain.get<HighCut>(), highCutCoefficients, chainSettings.HighCutSlope);
+    //single a repaint
+}
+
 
 void ResponseCurveComponent::paint(juce::Graphics& g)
 {
@@ -69,6 +73,9 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
     // g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(Colours::black);
+    g.drawImage(background,getLocalBounds().toFloat());
+
+    
 
     auto responseArea = getLocalBounds();
 
@@ -154,6 +161,30 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     g.strokePath(responseCurve, PathStrokeType(2.0f));
 }
 
+void ResponseCurveComponent::resized()
+{
+    Component::resized();
+    using namespace juce;
+    background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
+    Graphics g(background);
+
+    Array<float> freqs{20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 4000, 5000, 10000, 20000};
+
+    g.setColour(Colours::white);
+    for (auto f : freqs)
+    {
+        auto normX = mapFromLog10(f, 20.f, 2000.0f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+
+    Array<float> gains{-24, -12, 0, 12, 24};
+    for (auto gDb : gains)
+    {
+        auto y = jmap(gDb,-24.0f,24.0f,float(getHeight()),0.0f);
+        g.drawHorizontalLine(y,0,getWidth());
+    }
+}
+
 
 //==============================================================================
 SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcessor& p)
@@ -178,14 +209,14 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 
-    peakFreqSlider.labels.add({0.f,"20Hz"});
-    peakFreqSlider.labels.add({1.f,"20kHz"});
-    highCutFreqSlider.labels.add({0.f,"20Hz"});
-    highCutFreqSlider.labels.add({1.f,"20kHz"});
-    lowCutFreqSlider.labels.add({0.f,"20Hz"});
-    lowCutFreqSlider.labels.add({1.f,"20kHz"});
-    
-    
+    peakFreqSlider.labels.add({0.f, "20Hz"});
+    peakFreqSlider.labels.add({1.f, "20kHz"});
+    highCutFreqSlider.labels.add({0.f, "20Hz"});
+    highCutFreqSlider.labels.add({1.f, "20kHz"});
+    lowCutFreqSlider.labels.add({0.f, "20Hz"});
+    lowCutFreqSlider.labels.add({1.f, "20kHz"});
+
+
     for (auto* comp : GetComps())
     {
         addAndMakeVisible(comp);
@@ -209,10 +240,14 @@ void SampleEQAudioProcessorEditor::paint(juce::Graphics& g)
 void SampleEQAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33f);
+
+    float hRatio = 0.33f; // JUCE_LIVE_CONSTANT(33)/100.0f;
+
+    auto responseArea = bounds.removeFromTop(bounds.getHeight() * hRatio);
 
     responseCurveComponent.setBounds(responseArea);
 
+    bounds.removeFromTop(5);
     auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33f);
     // 66 -> 0.5 = 0.33
     auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5f);

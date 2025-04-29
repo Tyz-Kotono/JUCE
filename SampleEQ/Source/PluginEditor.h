@@ -26,12 +26,15 @@ struct ResponseCurveComponent : juce::Component,
     void timerCallback() override;
 
     void paint(juce::Graphics&) override;
-
+    void resized() override;
 private:
     SampleEQAudioProcessor& audioProcessor;
     juce::Atomic<bool> parametersChanged{false};
 
     MonoChain monoChain;
+    void UpdateChain();
+
+    juce::Image background;
 };
 
 //==============================================================================
