@@ -255,7 +255,7 @@ void ResponseCurveComponent::resized()
                 str << "+";
             str << gDb;
 
-            //font
+            //font right
             auto textWidth = g.getCurrentFont().getStringWidth(str);
 
             juce::Rectangle<int> r;
@@ -267,6 +267,15 @@ void ResponseCurveComponent::resized()
 
             g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
             g.drawFittedText(str, r, juce::Justification::centred, 1);
+
+            //Font left
+            str.clear();
+            str << (gDb - 24.0f);
+            r.setX(1);
+            textWidth = g.getCurrentFont().getStringWidth(str);
+            r.setSize(textWidth,fontHeight);
+            g.drawFittedText(str, r, juce::Justification::centred, 1);
+            
         }
     }
 }
