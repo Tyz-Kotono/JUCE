@@ -73,14 +73,13 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
     // g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(Colours::black);
-    // g.drawImage(background,getLocalBounds().toFloat());
+    g.drawImage(background,getLocalBounds().toFloat());
 
-  
 
     // auto responseArea = getLocalBounds();
     //limit line
-    auto responseArea =   getRenderArea();
-    
+    auto responseArea = getAnalisisArea();
+
     auto W = responseArea.getWidth();
     auto H = responseArea.getHeight();
 
@@ -156,8 +155,12 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
 
+
+    g.setColour(Colours::red);
+    g.drawRect(getLocalBounds());
+
     g.setColour(Colours::orange);
-    g.drawRoundedRectangle(responseArea.toFloat(), 4.0f, 1.0f);
+    g.drawRoundedRectangle(getRenderArea().toFloat(), 2.0f, 1.0f);
 
     g.setColour(Colours::white);
     g.strokePath(responseCurve, PathStrokeType(2.0f));
@@ -172,21 +175,38 @@ void ResponseCurveComponent::resized()
 
     Array<float> freqs{20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 4000, 5000, 10000, 20000};
 
-    g.setColour(Colours::white);
+    //Draw Line
+
+    auto renderArea = getAnalisisArea();
+    auto left = renderArea.getX();
+    auto right = renderArea.getRight();
+    auto top = renderArea.getY();
+    auto bottom = renderArea.getBottom();
+    auto width = renderArea.getWidth();
+
+    Array<float> xs;
     for (auto f : freqs)
     {
         auto normX = mapFromLog10(f, 20.f, 2000.0f);
-        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+        xs.add(left + width * normX);
+    }
+
+    g.setColour(Colours::dimgrey);
+    for (auto f : xs)
+    {
+        g.drawVerticalLine(f, top, bottom);
     }
 
     Array<float> gains{-24, -12, 0, 12, 24};
+
     for (auto gDb : gains)
     {
-        auto y = jmap(gDb,-24.0f,24.0f,float(getHeight()),0.0f);
-        g.drawHorizontalLine(y,0,getWidth());
+        auto y = jmap(gDb, -24.0f, 24.0f, float(bottom), float(top));
+        g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
+        g.drawHorizontalLine(y, left, right);
     }
 
-    // g.drawRect(getRenderArea());
+    g.drawRect(getAnalisisArea());
 }
 
 
@@ -194,16 +214,20 @@ juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
 {
     auto bounds = getLocalBounds();
     // bounds.reduce(JUCE_LIVE_CONSTANT(5),JUCE_LIVE_CONSTANT(3));
-    bounds.reduce(12,10);
+    bounds.reduce(12, 10);
     bounds.removeFromTop(12);
     bounds.removeFromBottom(2);
     bounds.removeFromLeft(20);
     bounds.removeFromRight(20);
-    return  bounds;
+    return bounds;
 }
 
 juce::Rectangle<int> ResponseCurveComponent::getAnalisisArea()
 {
+    auto bounds = getRenderArea();
+    bounds.removeFromTop(4);
+    bounds.removeFromBottom(4);
+    return bounds;
 }
 
 //==============================================================================
