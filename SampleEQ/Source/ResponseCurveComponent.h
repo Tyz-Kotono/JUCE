@@ -10,6 +10,8 @@
 
 #pragma once
 #include <JuceHeader.h>
+
+#include "PathProducer.h"
 #include "PluginProcessor.h"
 #include "RotarySliderWithLabels.h"
 
@@ -26,7 +28,7 @@ struct ResponseCurveComponent : juce::Component,
 
   void timerCallback() override;
 
-  void updateFFT();
+  void updateFFT(juce::Rectangle<float> fftBounds, double sampleRate);
   
   void paint(juce::Graphics&) override;
   void paintResponseCurve(juce::Graphics&);
@@ -43,11 +45,6 @@ private:
   juce::Rectangle<int> getRenderArea();
   juce::Rectangle<int> getAnalysisArea();
 
-  SingleChannelSampleFifo<SampleEQAudioProcessor::BlockType>* leftChannelFifo ;
-  juce::AudioBuffer<float> monoBuffer;
-  FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
-  AnalyzerPathGenerator<juce::Path> pathProducer;
-
-  juce::Path leftChannelFFTPath;
-  SingleChannelSampleFifo<SampleEQAudioProcessor::BlockType>* rightChannelFifo ;
+  PathProducer leftPathProducer,rightPathProducer;
+   
 };

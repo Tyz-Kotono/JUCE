@@ -165,5 +165,6 @@ private:
     void UpdateHighCutFilters(const ChainSettings& chainSettings);
     void UpdateLowCutFilters(const ChainSettings& chainSettings);
 
+    juce::dsp::Oscillator<float> osc;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };

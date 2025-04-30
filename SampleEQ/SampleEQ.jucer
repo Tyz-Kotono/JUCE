@@ -4,6 +4,9 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="Wb9kXP" name="SampleEQ">
     <GROUP id="{294BD698-11E0-3176-DDD1-129562986479}" name="Source">
+      <FILE id="ta6OwU" name="PathProducer.cpp" compile="1" resource="0"
+            file="Source/PathProducer.cpp"/>
+      <FILE id="yoITps" name="PathProducer.h" compile="0" resource="0" file="Source/PathProducer.h"/>
       <FILE id="hZU6MP" name="ResponseCurveComponent.cpp" compile="1" resource="0"
             file="Source/ResponseCurveComponent.cpp"/>
       <FILE id="ea2gsf" name="ResponseCurveComponent.h" compile="0" resource="0"

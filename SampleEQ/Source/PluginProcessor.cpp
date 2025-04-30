@@ -146,6 +146,13 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
 
     leftChannelFifo.prepare(samplesPerBlock);
     rightChannelFifo.prepare(samplesPerBlock);
+
+
+    
+    // osc.initialise([](float x) { return std::sin(x); });
+    // spec.numChannels = getTotalNumOutputChannels();
+    // osc.prepare(spec);
+    // osc.setFrequency(1000);
 }
 
 void SampleEQAudioProcessor::releaseResources()
@@ -199,8 +206,12 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 
     UpdateFilters();
 
-
     juce::dsp::AudioBlock<float> block(buffer);
+
+    // buffer.clear();
+    // juce::dsp::ProcessContextReplacing<float> stereoContext(block);
+    // osc.process(stereoContext);
+    
 
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
@@ -214,7 +225,7 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     //FFT Buffer
     leftChannelFifo.update(buffer);
     rightChannelFifo.update(buffer);
-    
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
