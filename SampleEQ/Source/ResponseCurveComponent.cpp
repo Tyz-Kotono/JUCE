@@ -134,6 +134,7 @@ void ResponseCurveComponent::updateFFT()
     {
         pathProducer.getPath(leftChannelFFTPath);
     }
+
     
 }
 
@@ -158,7 +159,10 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
 
     paintResponseCurve(g);
-
+    //Limit the path in the area 
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(getAnalysisArea().getX(),getAnalysisArea().getY()));
+    
+    
     g.setColour(Colours::blue);
     g.strokePath(leftChannelFFTPath,PathStrokeType(1));
     
