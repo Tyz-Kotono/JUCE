@@ -10,7 +10,135 @@
 
 #include <JuceHeader.h>
 
-#include "juce_graphics/fonts/harfbuzz/hb-aat-layout-morx-table.hh"
+
+enum Channel
+{
+    Right,
+    Left
+};
+
+#include <array>
+
+template <typename T>
+struct Fifo
+{
+    void preapre(int numChannels, int numSample)
+    {
+        for (auto& buffer : buffers)
+        {
+            buffer.setSize(
+                numChannels,
+                numSample,
+                false,
+                true,
+                true
+            );
+            buffer.clear();
+        }
+    }
+
+    bool push(const T& t)
+    {
+        auto write = fifo.write(1);
+        if (write.blockSize1 > 0)
+        {
+            buffers[write.startIndex1] = t;
+            return true;
+        }
+        return false;
+    }
+
+    bool pull(T& t)
+    {
+        auto read = fifo.read(1);
+        if (read.blockSize1 > 0)
+        {
+            t = buffers[read.startIndex1];
+            return true;
+        }
+        return false;
+    }
+
+private:
+    static constexpr int Capacity = 30;
+    std::array<T, Capacity> buffers;
+    juce::AbstractFifo fifo{Capacity};
+};
+
+template <typename BlockType>
+struct SingleChannelSampleFifo
+{
+    SingleChannelSampleFifo(Channel ch) : juce::channelToUse(ch)
+    {
+        prepared.set(false);
+    }
+
+    void Update(const BlockType& buffer)
+    {
+        jassert(prepared.get());
+        jassert(buffer.getNumChannels() > channelToUse);
+        auto* channelPtr = buffer.getReadPointer(channelToUse);
+
+        for (int i = 0; i < buffer.getNmSamples; ++i)
+        {
+            pushNextSampleIntoFifo(channelPtr[i]);
+        }
+    }
+
+    void Prepare(int bufferSize)
+    {
+        prepared.set(false);
+        size.set(bufferSize);
+
+        bufferToFill.setSzie
+        (
+            1,
+            bufferSize,
+            false,
+            true,
+            true
+        );
+        audioBufferFifo.prepare(1, bufferSize);
+        fifoIndex = 0;
+        prepared.set(true);
+    }
+
+    int GetNumCompleteBufferAvailable() const
+    {
+        return audioBufferFifo.getNumAvailableForReading;
+    }
+
+    bool isPrepared() const { return prepared.get(); }
+    int getSize() const { return size.get(); }
+
+    //
+    bool GetAudioBuffer(BlockType& buffer)
+    {
+        return audioBufferFifo.pull(buffer);
+    }
+
+private:
+    Channel channelToUse;
+    int fifoIndex = 0;
+    Fifo<BlockType> audioBufferFifo;
+    BlockType bufferToFill;
+
+    juce::Atomic<bool> prepared = false;
+    juce::Atomic<int> size = 0;
+
+    void pushNextSampleIntoFifo(float Sample)
+    {
+        if (fifoIndex == buffertoFill.getNumSample())
+        {
+            auto ok = audioBufferFifo.push(buffertoFill);
+            juce::ignoreUnused(ok);
+            fifoIndex = 0;
+        }
+        buffertoFill.setSample(0, fifoIndex, Sample);
+        ++fifoIndex;
+    }
+};
+
 
 enum Slope
 {
@@ -27,8 +155,6 @@ struct ChainSettings
 
     Slope LowCutSlope{Slope::Slope_12}, HighCutSlope{Slope::Slope_12};
 };
-
-
 
 
 //Butterworth Highpass
@@ -65,15 +191,15 @@ void UpdateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficien
 inline Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
 {
     return
-       juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-           sampleRate,
-           chainSettings.peakFreq,
-           chainSettings.peakQuality,
-           juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
-       );
+        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            sampleRate,
+            chainSettings.peakFreq,
+            chainSettings.peakQuality,
+            juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+        );
 }
 
-inline auto makeLowCutFilters(const ChainSettings& chainSettings,  double sampleRate)
+inline auto makeLowCutFilters(const ChainSettings& chainSettings, double sampleRate)
 {
     return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod
     (
@@ -82,19 +208,18 @@ inline auto makeLowCutFilters(const ChainSettings& chainSettings,  double sample
         2 * (chainSettings.LowCutSlope + 1)
     );
 }
+
 inline auto makeHighCutFilters(const ChainSettings& chainSettings, double sampleRate)
 {
     return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod
-  (
-      chainSettings.highCutFreq,
-      sampleRate,
-      2 * (chainSettings.HighCutSlope + 1)
-  );
+    (
+        chainSettings.highCutFreq,
+        sampleRate,
+        2 * (chainSettings.HighCutSlope + 1)
+    );
 }
 
-#pragma endregion 
-
-
+#pragma endregion
 
 
 //==============================================================================
@@ -158,10 +283,10 @@ private:
     MonoChain leftChain, rightChain;
 
     void UpdateFilters();
-    
+
     //Single Filter
     void UpdatePeakFilter(const ChainSettings& chainSettings);
-    
+
     void UpdateHighCutFilters(const ChainSettings& chainSettings);
     void UpdateLowCutFilters(const ChainSettings& chainSettings);
 
