@@ -148,9 +148,9 @@ public:
         CreateParameterLayout(),
     };
 
-    using BlockType = juce::AudioBuffer<float>;
-    SingleChannelSampleFifo<BlockType> leftChannelFifo{Channel::Left};
-    SingleChannelSampleFifo<BlockType> rightChannelFifo{Channel::Right};
+    // using BlockType = juce::AudioBuffer<float>;
+    // SingleChannelSampleFifo<BlockType> leftChannelFifo{Channel::Left};
+    // SingleChannelSampleFifo<BlockType> rightChannelFifo{Channel::Right};
 private:
     //==============================================================================
 

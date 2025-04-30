@@ -59,15 +59,19 @@ struct Fifo
         }
         return false;
     }
-
+    int getNumAvailableForReading() const
+    {
+        return fifo.getNumReady();
+    }
 private:
     static constexpr int Capacity = 30;
     std::array<T, Capacity> buffers;
     juce::AbstractFifo fifo{Capacity};
 };
 
+//  using BlockType = juce::AudioBuffer<float>;
 template <typename BlockType>
-struct SingleChannelSampleFifo
+struct SingleChannelSampleFifo  // : juce::AudioBuffer<float>
 {
     juce::AudioBuffer<float> buffer;
     SingleChannelSampleFifo(Channel ch) // : juce::channelToUse(ch)
@@ -81,18 +85,19 @@ struct SingleChannelSampleFifo
         jassert(buffer.getNumChannels() > channelToUse);
         auto* channelPtr = buffer.getReadPointer(channelToUse);
 
-        for (int i = 0; i < buffer.getNmSamples; ++i)
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
         {
             pushNextSampleIntoFifo(channelPtr[i]);
         }
     }
 
+    //Set the Sample Block by prepareToPlay
     void Prepare(int bufferSize)
     {
         prepared.set(false);
         size.set(bufferSize);
 
-        bufferToFill.setSzie
+        bufferToFill.setSize
         (
             1,
             bufferSize,
@@ -100,14 +105,14 @@ struct SingleChannelSampleFifo
             true,
             true
         );
-        audioBufferFifo.prepare(1, bufferSize);
+        audioBufferFifo.preapre(1, bufferSize);
         fifoIndex = 0;
         prepared.set(true);
     }
 
     int GetNumCompleteBufferAvailable() const
     {
-        return audioBufferFifo.getNumAvailableForReading;
+        return audioBufferFifo.getNumAvailableForReading();
     }
 
     bool isPrepared() const { return prepared.get(); }
@@ -130,13 +135,13 @@ private:
 
     void pushNextSampleIntoFifo(float Sample)
     {
-        if (fifoIndex == buffertoFill.getNumSample())
+        if (fifoIndex == bufferToFill.getNumSamples())
         {
-            auto ok = audioBufferFifo.push(buffertoFill);
+            auto ok = audioBufferFifo.push(bufferToFill);
             juce::ignoreUnused(ok);
             fifoIndex = 0;
         }
-        buffertoFill.setSample(0, fifoIndex, Sample);
+        bufferToFill.setSample(0, fifoIndex, Sample);
         ++fifoIndex;
     }
 };

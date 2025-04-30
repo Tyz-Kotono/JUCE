@@ -7,37 +7,8 @@
 */
 
 #pragma once
+#include "ResponseCurveComponent.h"
 
-#include <JuceHeader.h>
-#include "PluginProcessor.h"
-#include "RotarySliderWithLabels.h"
-
-struct ResponseCurveComponent : juce::Component,
-                                juce::AudioProcessorParameter::Listener,
-                                juce::Timer
-{
-    ResponseCurveComponent(SampleEQAudioProcessor&);
-    ~ResponseCurveComponent() override;
-
-    //Call back
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
-
-    void timerCallback() override;
-
-    void paint(juce::Graphics&) override;
-    void resized() override;
-private:
-    SampleEQAudioProcessor& audioProcessor;
-    juce::Atomic<bool> parametersChanged{false};
-
-    MonoChain monoChain;
-    void UpdateChain();
-
-    juce::Image background;
-    juce::Rectangle<int> getRenderArea();
-    juce::Rectangle<int> getAnalisisArea();
-};
 
 //==============================================================================
 /**
