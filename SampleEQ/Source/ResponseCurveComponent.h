@@ -26,7 +26,11 @@ struct ResponseCurveComponent : juce::Component,
 
   void timerCallback() override;
 
+  void updateFFT();
+  
   void paint(juce::Graphics&) override;
+  void paintResponseCurve(juce::Graphics&);
+  
   void resized() override;
 private:
   SampleEQAudioProcessor& audioProcessor;
@@ -39,6 +43,11 @@ private:
   juce::Rectangle<int> getRenderArea();
   juce::Rectangle<int> getAnalysisArea();
 
-  // SingleChannelSampleFifo<SampleEQAudioProcessor::BlockType>* leftChannelFifo ;
-  // SingleChannelSampleFifo<SampleEQAudioProcessor::BlockType>* rightChannelFifo ;
+  SingleChannelSampleFifo<SampleEQAudioProcessor::BlockType>* leftChannelFifo ;
+  juce::AudioBuffer<float> monoBuffer;
+  FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
+  AnalyzerPathGenerator<juce::Path> pathProducer;
+
+  juce::Path leftChannelFFTPath;
+  SingleChannelSampleFifo<SampleEQAudioProcessor::BlockType>* rightChannelFifo ;
 };

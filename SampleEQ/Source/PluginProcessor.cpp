@@ -144,8 +144,8 @@ void SampleEQAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     // Low High Cut Butterworth Highpass
     UpdateFilters();
 
-    // leftChannelFifo.Prepare(samplesPerBlock);
-    // rightChannelFifo.Prepare(samplesPerBlock);
+    leftChannelFifo.prepare(samplesPerBlock);
+    rightChannelFifo.prepare(samplesPerBlock);
 }
 
 void SampleEQAudioProcessor::releaseResources()
@@ -212,8 +212,8 @@ void SampleEQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
     rightChain.process(rightContext);
 
     //FFT Buffer
-    // leftChannelFifo.Update(buffer);
-    // rightChannelFifo.Update(buffer);
+    leftChannelFifo.update(buffer);
+    rightChannelFifo.update(buffer);
     
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...

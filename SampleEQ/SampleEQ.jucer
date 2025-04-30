@@ -14,6 +14,10 @@
             file="Source/RotarySliderWithLabels.h"/>
       <FILE id="IlhVM6" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
+      <FILE id="osd3yH" name="SingleChannelSampleFifo.cpp" compile="1" resource="0"
+            file="Source/SingleChannelSampleFifo.cpp"/>
+      <FILE id="ZySx4I" name="SingleChannelSampleFifo.h" compile="0" resource="0"
+            file="Source/SingleChannelSampleFifo.h"/>
       <FILE id="fgF7H8" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
       <FILE id="UxYr9l" name="PluginEditor.cpp" compile="1" resource="0"
