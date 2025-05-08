@@ -65,10 +65,16 @@ private:
             &lowCutSlopeSlider,
             &highCutFreqSlider,
             &highCutSlopeSlider,
-            &responseCurveComponent
+            &responseCurveComponent,
+
+            &lowCutBypassButton,
+            &peakBypassButton,
+            &highCutBypassButton,
+            &analyzerEnableButton,
         };
     }
 
+    juce::ToggleButton lowCutBypassButton,peakBypassButton,highCutBypassButton,analyzerEnableButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessorEditor)
 };

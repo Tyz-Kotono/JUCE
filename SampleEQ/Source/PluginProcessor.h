@@ -26,6 +26,7 @@ struct ChainSettings
     float lowCutFreq{0}, highCutFreq{0};
 
     Slope LowCutSlope{Slope::Slope_12}, HighCutSlope{Slope::Slope_12};
+    bool lowCutBypass{false},peakBypass{false},highCutBypass{false};
 };
 
 
