@@ -38,6 +38,9 @@
 **/SampleEQ/Builds
 **/SampleEQ/JuceLibraryCode
 
+**/AudioPlayer/Builds
+**/AudioPlayer/JuceLibraryCode
+
 
 **/00_HelloWorld/Builds
 **/00_HelloWorld/JuceLibraryCode
