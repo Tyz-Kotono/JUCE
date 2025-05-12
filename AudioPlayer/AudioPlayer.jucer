@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="HiI7ua" name="AudioPlayer" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Kotono">
   <MAINGROUP id="ssWUU5" name="AudioPlayer">
     <GROUP id="{83710B67-E412-62B3-5AC8-B6481496A244}" name="Source">
       <FILE id="nXrUIb" name="PluginProcessor.cpp" compile="1" resource="0"

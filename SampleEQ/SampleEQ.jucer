@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="dMRqLf" name="SampleEQ" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Kotono">
   <MAINGROUP id="Wb9kXP" name="SampleEQ">
     <GROUP id="{294BD698-11E0-3176-DDD1-129562986479}" name="Source">
       <FILE id="ta6OwU" name="PathProducer.cpp" compile="1" resource="0"

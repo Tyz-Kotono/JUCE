@@ -29,26 +29,33 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
       lowCutFreqSliderAttachment(audioProcessor.apvts, "LowCut Freq", lowCutFreqSlider),
       lowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", lowCutSlopeSlider),
       highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSlider),
-      highCutSlopeSliderAttachment(audioProcessor.apvts, "High Slope", highCutSlopeSlider)
-{
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+      highCutSlopeSliderAttachment(audioProcessor.apvts, "High Slope", highCutSlopeSlider),
 
-    peakFreqSlider.labels.add({0.f, "20Hz"});
-    peakFreqSlider.labels.add({1.f, "20kHz"});
-    highCutFreqSlider.labels.add({0.f, "20Hz"});
-    highCutFreqSlider.labels.add({1.f, "20kHz"});
-    lowCutFreqSlider.labels.add({0.f, "20Hz"});
-    lowCutFreqSlider.labels.add({1.f, "20kHz"});
+      lowCutBypassButtonAttachment(audioProcessor.apvts, lowCutBypass, lowCutBypassButton),
+      peakBypassButtonAttachment(audioProcessor.apvts, peakByPass, peakBypassButton),
+      highCutBypassButtonAttachment(audioProcessor.apvts, highCutBypass, highCutBypassButton),
+      analyzerEnableButtonAttachment(audioProcessor.apvts, analyzerByPass, analyzerEnableButton)
+      {
+          // Make sure that before the constructor has finished, you've set the
+          // editor's size to whatever you need it to be.
+
+          peakFreqSlider.labels.add({0.f, "20Hz"});
+          peakFreqSlider.labels.add({1.f, "20kHz"});
+          highCutFreqSlider.labels.add({0.f, "20Hz"});
+          highCutFreqSlider.labels.add({1.f, "20kHz"});
+          lowCutFreqSlider.labels.add({0.f, "20Hz"});
+          lowCutFreqSlider.labels.add({1.f, "20kHz"});
 
 
-    for (auto* comp : GetComps())
-    {
-        addAndMakeVisible(comp);
-    }
+    for (auto*comp: GetComps())
+          {
+              addAndMakeVisible(comp);
+    
+          }
 
-    setSize(600, 400);
-}
+          setSize(600, 400);
+
+      }
 
 SampleEQAudioProcessorEditor::~SampleEQAudioProcessorEditor()
 {
@@ -77,7 +84,6 @@ void SampleEQAudioProcessorEditor::resized()
     // 66 -> 0.5 = 0.33
     auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5f);
 
-    
 
     lowCutBypassButton.setBounds(lowCutArea.removeFromTop(25));
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.5));

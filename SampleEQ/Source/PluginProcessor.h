@@ -26,7 +26,7 @@ struct ChainSettings
     float lowCutFreq{0}, highCutFreq{0};
 
     Slope LowCutSlope{Slope::Slope_12}, HighCutSlope{Slope::Slope_12};
-    bool lowCutBypass{false},peakBypass{false},highCutBypass{false};
+    bool lowCutBypass{true}, peakBypass{false}, highCutBypass{false};
 };
 
 
@@ -98,6 +98,15 @@ inline auto makeHighCutFilters(const ChainSettings& chainSettings, double sample
 //==============================================================================
 /**
 */
+
+
+const std::string
+    lowCutBypass = "LowCut Bypass",
+    peakByPass = "Peak Bypass",
+    highCutBypass = "HighCut Bypass",
+    analyzerByPass = "Analyzer Bypass";
+
+
 class SampleEQAudioProcessor : public juce::AudioProcessor
 {
 public:
@@ -152,6 +161,7 @@ public:
     using BlockType = juce::AudioBuffer<float>;
     SingleChannelSampleFifo<BlockType> leftChannelFifo{Channel::Left};
     SingleChannelSampleFifo<BlockType> rightChannelFifo{Channel::Right};
+
 private:
     //==============================================================================
 
@@ -169,3 +179,4 @@ private:
     juce::dsp::Oscillator<float> osc;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessor)
 };
+

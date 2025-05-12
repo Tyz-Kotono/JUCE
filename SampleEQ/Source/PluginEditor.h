@@ -74,7 +74,15 @@ private:
         };
     }
 
-    juce::ToggleButton lowCutBypassButton,peakBypassButton,highCutBypassButton,analyzerEnableButton;
+    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton, analyzerEnableButton;
+
+    ButtonAttachment
+        lowCutBypassButtonAttachment,
+        peakBypassButtonAttachment,
+        highCutBypassButtonAttachment,
+        analyzerEnableButtonAttachment;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessorEditor)
 };
