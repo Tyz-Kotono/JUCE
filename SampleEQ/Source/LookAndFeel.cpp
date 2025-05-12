@@ -23,11 +23,13 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& graphics, int x, int y, int w
 
     auto bounds = Rectangle<float>(x, y, width, height);
 
+    auto enabled = slider.isEnabled();
+
     //Draw Ellipse and Edge
-    graphics.setColour(Colour(97u, 18u, 167u));
+    graphics.setColour(enabled ? Colour(97u, 18u, 167u) : Colours::darkgrey);
     graphics.fillEllipse(bounds);
 
-    graphics.setColour(Colour(255u, 154u, 1u));
+    graphics.setColour(enabled ? Colour(255u, 154u, 1u) : Colours::darkgrey);
     graphics.drawEllipse(bounds, 1.0f);
 
 
