@@ -86,7 +86,7 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggle
     }
     else if (auto* pd = dynamic_cast<AnalyzerButton*>(&togglebutton))
     {
-        DrawAnalyzerButton(g, togglebutton);
+        DrawAnalyzerButton(g, *pd);
     }
 }
 
@@ -129,7 +129,7 @@ void LookAndFeel::DrawPowerButton(juce::Graphics& g, juce::ToggleButton& toggleb
     g.drawEllipse(r, 2.0f);
 }
 
-void LookAndFeel::DrawAnalyzerButton(juce::Graphics& g, juce::ToggleButton& togglebutton)
+void LookAndFeel::DrawAnalyzerButton(juce::Graphics& g, AnalyzerButton& togglebutton)
 {
     using namespace juce;
 
@@ -139,22 +139,5 @@ void LookAndFeel::DrawAnalyzerButton(juce::Graphics& g, juce::ToggleButton& togg
     auto bounds = togglebutton.getLocalBounds();
     auto insetRect = bounds.reduced(4);
 
-    Path randomPath;
-
-    Random r;
-
-    randomPath.startNewSubPath(insetRect.getX(),
-                               insetRect.getY() + insetRect.getHeight() * r.nextFloat()
-    );
-
-    for (auto x = insetRect.getX() + 1; x < insetRect.getRight(); x += 2)
-    {
-        randomPath.lineTo(x,
-                          insetRect.getY() + insetRect.getHeight() *
-                          r.nextFloat()
-        );
-    }
-    g.strokePath(randomPath, PathStrokeType(1.0f));
-
-
+    g.strokePath(togglebutton.randomPath, PathStrokeType(1.0f));
 }

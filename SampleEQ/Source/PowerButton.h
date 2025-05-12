@@ -14,9 +14,12 @@
 class AnalyzerButton : public juce::ToggleButton
 {
 public:
+  juce::Path randomPath;
+  void resized() override;
 };
 
-class PowerButton :  public juce::ToggleButton
+class PowerButton : public juce::ToggleButton
 {
 public:
+   
 };

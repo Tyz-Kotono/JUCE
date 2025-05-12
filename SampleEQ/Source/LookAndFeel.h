@@ -11,6 +11,8 @@
 #pragma once
 #include <JuceHeader.h>
 
+class AnalyzerButton;
+
 struct LookAndFeel : juce::LookAndFeel_V4
 {
 public:
@@ -30,5 +32,5 @@ public:
     void DrawPowerButton(juce::Graphics& g,
                          juce::ToggleButton& togglebutton);
     void DrawAnalyzerButton(juce::Graphics& g,
-                         juce::ToggleButton& togglebutton);
+                         AnalyzerButton& togglebutton);
 };
