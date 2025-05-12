@@ -55,11 +55,16 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
     peakBypassButton.setLookAndFeel(&lnf);
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
+    analyzerEnableButton.setLookAndFeel(&lnf);
     setSize(600, 400);
 }
 
 SampleEQAudioProcessorEditor::~SampleEQAudioProcessorEditor()
 {
+    peakBypassButton.setLookAndFeel(nullptr);
+    lowCutBypassButton.setLookAndFeel(nullptr);
+    highCutBypassButton.setLookAndFeel(nullptr);
+    analyzerEnableButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -74,6 +79,15 @@ void SampleEQAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
 
+    auto analyzerEnabledArea = bounds.removeFromTop(25);
+    analyzerEnabledArea.setWidth(100);
+    analyzerEnabledArea.setX(5);
+    analyzerEnabledArea.removeFromTop(2);
+    analyzerEnableButton.setBounds(analyzerEnabledArea);
+
+    bounds.removeFromTop(5);
+
+    
     float hRatio = 0.33f; // JUCE_LIVE_CONSTANT(33)/100.0f;
 
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * hRatio);
@@ -81,7 +95,7 @@ void SampleEQAudioProcessorEditor::resized()
     responseCurveComponent.setBounds(responseArea);
 
     bounds.removeFromTop(5);
-    auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33f);
+    auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.3f);
     // 66 -> 0.5 = 0.33
     auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5f);
 

@@ -8,7 +8,7 @@
 
 #pragma once
 #include "ResponseCurveComponent.h"
-
+#include "PowerButton.h"
 
 //==============================================================================
 /**
@@ -75,7 +75,8 @@ private:
     }
 
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
-    juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton, analyzerEnableButton;
+    PowerButton lowCutBypassButton, peakBypassButton, highCutBypassButton;
+    AnalyzerButton analyzerEnableButton;
 
     ButtonAttachment
         lowCutBypassButtonAttachment,
