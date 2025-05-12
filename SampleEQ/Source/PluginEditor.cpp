@@ -35,27 +35,28 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
       peakBypassButtonAttachment(audioProcessor.apvts, peakByPass, peakBypassButton),
       highCutBypassButtonAttachment(audioProcessor.apvts, highCutBypass, highCutBypassButton),
       analyzerEnableButtonAttachment(audioProcessor.apvts, analyzerByPass, analyzerEnableButton)
-      {
-          // Make sure that before the constructor has finished, you've set the
-          // editor's size to whatever you need it to be.
+{
+    // Make sure that before the constructor has finished, you've set the
+    // editor's size to whatever you need it to be.
 
-          peakFreqSlider.labels.add({0.f, "20Hz"});
-          peakFreqSlider.labels.add({1.f, "20kHz"});
-          highCutFreqSlider.labels.add({0.f, "20Hz"});
-          highCutFreqSlider.labels.add({1.f, "20kHz"});
-          lowCutFreqSlider.labels.add({0.f, "20Hz"});
-          lowCutFreqSlider.labels.add({1.f, "20kHz"});
+    peakFreqSlider.labels.add({0.f, "20Hz"});
+    peakFreqSlider.labels.add({1.f, "20kHz"});
+    highCutFreqSlider.labels.add({0.f, "20Hz"});
+    highCutFreqSlider.labels.add({1.f, "20kHz"});
+    lowCutFreqSlider.labels.add({0.f, "20Hz"});
+    lowCutFreqSlider.labels.add({1.f, "20kHz"});
 
 
-    for (auto*comp: GetComps())
-          {
-              addAndMakeVisible(comp);
-    
-          }
+    for (auto* comp : GetComps())
+    {
+        addAndMakeVisible(comp);
+    }
 
-          setSize(600, 400);
-
-      }
+    peakBypassButton.setLookAndFeel(&lnf);
+    lowCutBypassButton.setLookAndFeel(&lnf);
+    highCutBypassButton.setLookAndFeel(&lnf);
+    setSize(600, 400);
+}
 
 SampleEQAudioProcessorEditor::~SampleEQAudioProcessorEditor()
 {

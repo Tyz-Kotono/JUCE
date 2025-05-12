@@ -73,12 +73,54 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& graphics, int x, int y, int w
     }
 }
 
+void LookAndFeel::drawToggleButton(juce::Graphics& g, juce::ToggleButton& togglebutton,
+                                   bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+{
+    //remove the default bool box
+    // LookAndFeel_V4::drawToggleButton(g, togglebutton, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+    using namespace juce;
+
+    Path powerButton;
+    auto bounds = togglebutton.getLocalBounds();
+
+    //Debug Edge
+    // g.setColour(Colours::red);
+    // g.drawRect(bounds);
+    
+    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight()) - 4;
+    auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
+
+    float ang = 30.0f;
+    size -= 6;
+
+    powerButton.addCentredArc(r.getCentreX(),
+                              r.getCentreY(),
+                              size * 0.5,
+                              size * 0.5,
+                              0.0f,
+                              degreesToRadians(ang),
+                              degreesToRadians(360.0f - ang),
+                              true
+    );
+
+    powerButton.startNewSubPath(r.getCentreX(), r.getY());
+    powerButton.lineTo(r.getCentre());
+
+    PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
+    DBG("LOW = " + juce::String(togglebutton.getState() ? "true" : "false"));
+    
+    g.setColour(togglebutton.getToggleState() ? Colours::dimgrey : Colour(0u, 172u, 1u));
+    g.strokePath(powerButton, pst);
+
+    g.drawEllipse(r,2.0f);
+}
+
 void RotarySliderWithLabels::paint(juce::Graphics& g)
 {
     using namespace juce;
     auto startAng = MathConstants<float>::pi + MathConstants<float>::pi * 0.25f;
     auto endAng = startAng + MathConstants<float>::pi * 1.5f;
-    
+
 
     auto range = getRange();
     auto sliderBounds = getSliderBounds();
@@ -123,7 +165,7 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
         r.setCentre(c);
         r.setY(r.getY() + getTextHeight());
 
-      
+
         g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
@@ -186,5 +228,3 @@ juce::String RotarySliderWithLabels::GetDisplayString() const
 
     return str;
 }
-
-

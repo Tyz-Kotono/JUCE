@@ -83,6 +83,7 @@ private:
         highCutBypassButtonAttachment,
         analyzerEnableButtonAttachment;
 
+    LookAndFeel lnf;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleEQAudioProcessorEditor)
 };

@@ -22,6 +22,11 @@ public:
                           float rotaryStartAngle,
                           float rotaryEndAngle,
                           juce::Slider&) override;
+
+    void drawToggleButton(juce::Graphics& g,
+                          juce::ToggleButton& togglebutton,
+                          bool shouldDrawButtonAsHighlighted,
+                          bool shouldDrawButtonAsDown) override;
 };
 
 struct RotarySliderWithLabels : juce::Slider
@@ -52,7 +57,7 @@ public:
     };
 
     juce::Array<LabelPos> labels;
-    
+
     void paint(juce::Graphics&) override;
     void resized() override;
 
@@ -64,8 +69,6 @@ private:
     LookAndFeel lnf;
     juce::RangedAudioParameter* param;
     juce::String suffix;
-
-
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RotarySliderWithLabels)

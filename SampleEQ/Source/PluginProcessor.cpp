@@ -430,9 +430,9 @@ void SampleEQAudioProcessor::UpdateFilters()
     leftChain.setBypassed<ChainPosition::HighCut>(chainSettings.highCutBypass);
     rightChain.setBypassed<ChainPosition::HighCut>(chainSettings.highCutBypass);
 
-    DBG("LOW = " + juce::String(chainSettings.lowCutBypass ? "true" : "false"));
-    DBG("PEAK = " + juce::String(chainSettings.peakBypass ? "true" : "false"));
-    DBG("HIGH = " + juce::String(chainSettings.highCutBypass ? "true" : "false"));
+    // DBG("LOW = " + juce::String(chainSettings.lowCutBypass ? "true" : "false"));
+    // DBG("PEAK = " + juce::String(chainSettings.peakBypass ? "true" : "false"));
+    // DBG("HIGH = " + juce::String(chainSettings.highCutBypass ? "true" : "false"));
 
 }
 
