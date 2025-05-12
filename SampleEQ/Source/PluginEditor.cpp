@@ -96,6 +96,15 @@ SampleEQAudioProcessorEditor::SampleEQAudioProcessorEditor(SampleEQAudioProcesso
             comp->highCutSlopeSlider.setEnabled(!bypassed);
         }
     };
+    analyzerEnableButton.onClick = [safePtr]
+    {
+
+        if(auto* comp = safePtr.getComponent())
+        {
+            auto bypassed = comp->analyzerEnableButton.getToggleState();
+            comp->responseCurveComponent.toggleAnalysisEnableemet(!bypassed);
+        }
+    };
 
 
     

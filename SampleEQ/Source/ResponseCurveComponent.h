@@ -19,32 +19,39 @@ struct ResponseCurveComponent : juce::Component,
                                 juce::AudioProcessorParameter::Listener,
                                 juce::Timer
 {
-  ResponseCurveComponent(SampleEQAudioProcessor&);
-  ~ResponseCurveComponent() override;
+    ResponseCurveComponent(SampleEQAudioProcessor&);
+    ~ResponseCurveComponent() override;
 
-  //Call back
-  void parameterValueChanged(int parameterIndex, float newValue) override;
-  void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+    //Call back
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
 
-  void timerCallback() override;
+    void timerCallback() override;
 
-  void updateFFT(juce::Rectangle<float> fftBounds, double sampleRate);
-  
-  void paint(juce::Graphics&) override;
-  void paintResponseCurve(juce::Graphics&);
-  
-  void resized() override;
+    void updateFFT(juce::Rectangle<float> fftBounds, double sampleRate);
+
+    void paint(juce::Graphics&) override;
+    void paintResponseCurve(juce::Graphics&);
+
+    void resized() override;
+
+    bool shouldShowFFTAnalysis = true;
+
+    void toggleAnalysisEnableemet(bool enabled)
+    {
+        shouldShowFFTAnalysis = enabled;
+    }
+
 private:
-  SampleEQAudioProcessor& audioProcessor;
-  juce::Atomic<bool> parametersChanged{false};
+    SampleEQAudioProcessor& audioProcessor;
+    juce::Atomic<bool> parametersChanged{false};
 
-  MonoChain monoChain;
-  void UpdateChain();
+    MonoChain monoChain;
+    void UpdateChain();
 
-  juce::Image background;
-  juce::Rectangle<int> getRenderArea();
-  juce::Rectangle<int> getAnalysisArea();
+    juce::Image background;
+    juce::Rectangle<int> getRenderArea();
+    juce::Rectangle<int> getAnalysisArea();
 
-  PathProducer leftPathProducer,rightPathProducer;
-   
+    PathProducer leftPathProducer, rightPathProducer;
 };

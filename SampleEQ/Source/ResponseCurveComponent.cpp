@@ -49,9 +49,13 @@ void ResponseCurveComponent::parameterGestureChanged(int parameterIndex, bool ge
 
 void ResponseCurveComponent::timerCallback()
 {
-    auto fftBounds = getAnalysisArea().toFloat();
-    auto sampleRate = audioProcessor.getSampleRate();
-    updateFFT(fftBounds, sampleRate);
+    if(shouldShowFFTAnalysis)
+    {
+        auto fftBounds = getAnalysisArea().toFloat();
+        auto sampleRate = audioProcessor.getSampleRate();
+        updateFFT(fftBounds, sampleRate);
+    }
+ 
 
     //Updata
     if (parametersChanged.compareAndSetBool(false, true))
@@ -97,23 +101,27 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
 
     paintResponseCurve(g);
-    //Limit the path in the area 
-    auto leftChannelFFTPath = leftPathProducer.getPath();
-    auto rightChannelFFTPath = rightPathProducer.getPath();
-    leftChannelFFTPath.
-        applyTransform(AffineTransform().translation(getAnalysisArea().getX(), getAnalysisArea().getY()));
-    rightChannelFFTPath.
-        applyTransform(AffineTransform().translation(getAnalysisArea().getX(), getAnalysisArea().getY()));
+
+    if(shouldShowFFTAnalysis)
+    {
+        //Limit the path in the area 
+        auto leftChannelFFTPath = leftPathProducer.getPath();
+        auto rightChannelFFTPath = rightPathProducer.getPath();
+        leftChannelFFTPath.
+            applyTransform(AffineTransform().translation(getAnalysisArea().getX(), getAnalysisArea().getY()));
+        rightChannelFFTPath.
+            applyTransform(AffineTransform().translation(getAnalysisArea().getX(), getAnalysisArea().getY()));
 
 
-    g.setColour(Colours::blue);
-    g.strokePath(leftPathProducer.getPath(), PathStrokeType(1));
-    g.setColour(Colours::red);
-    g.strokePath(rightPathProducer.getPath(), PathStrokeType(1));
-
+        g.setColour(Colours::blue);
+        g.strokePath(leftPathProducer.getPath(), PathStrokeType(1));
+        g.setColour(Colours::red);
+        g.strokePath(rightPathProducer.getPath(), PathStrokeType(1));
+    }
     
-    g.setColour(Colours::red);
-    g.drawRect(getLocalBounds());
+    
+    // g.setColour(Colours::red);
+    // g.drawRect(getLocalBounds());
 
     g.setColour(Colours::orange);
     g.drawRoundedRectangle(getRenderArea().toFloat(), 2.0f, 1.0f);
@@ -331,6 +339,7 @@ void ResponseCurveComponent::resized()
         }
     }
 }
+
 
 
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
