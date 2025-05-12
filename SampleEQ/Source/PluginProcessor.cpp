@@ -410,7 +410,8 @@ void SampleEQAudioProcessor::UpdateFilters()
 {
     const ChainSettings& chainSettings = getChainSettings(apvts);
 
-   
+    
+    
     //High Cut   
     UpdateHighCutFilters(chainSettings);
     // Single Filter
