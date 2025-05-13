@@ -94,11 +94,10 @@ void LevelMeterAudioProcessor::changeProgramName(int index, const juce::String& 
 //==============================================================================
 void LevelMeterAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
     rmsLevelLeft.reset(sampleRate, 0.5f);
     rmsLevelRight.reset(sampleRate, 0.5f);
 
+    //Jump to the target value immediately  
     rmsLevelLeft.setCurrentAndTargetValue(-100.0f);
     rmsLevelRight.setCurrentAndTargetValue(-100.0f);
 }
@@ -148,6 +147,7 @@ void LevelMeterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         const auto value = Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples));
 
         if (value < rmsLevelLeft.getCurrentValue())
+            //Level drop: Smooth transition
             rmsLevelLeft.setTargetValue(value);
         else
             rmsLevelLeft.setCurrentAndTargetValue(value);
