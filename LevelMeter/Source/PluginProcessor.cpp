@@ -21,9 +21,8 @@ LevelMeterAudioProcessor::LevelMeterAudioProcessor()
 #endif
     )
 #endif
-    
+
 {
-    
 }
 
 LevelMeterAudioProcessor::~LevelMeterAudioProcessor()
@@ -97,6 +96,11 @@ void LevelMeterAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    rmsLevelLeft.reset(sampleRate, 0.5f);
+    rmsLevelRight.reset(sampleRate, 0.5f);
+
+    rmsLevelLeft.setCurrentAndTargetValue(-100.0f);
+    rmsLevelRight.setCurrentAndTargetValue(-100.0f);
 }
 
 void LevelMeterAudioProcessor::releaseResources()
@@ -135,11 +139,29 @@ void LevelMeterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 {
     juce::ScopedNoDenormals noDenormals;
 
-    rmsLevelLeft = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
-    rmsLevelRight = buffer.getRMSLevel(1, 0, buffer.getNumSamples());
+    const auto numSamples = buffer.getNumSamples();
 
-    rmsLevelLeft = Decibels::gainToDecibels(rmsLevelLeft);
-    rmsLevelRight = Decibels::gainToDecibels(rmsLevelRight);
+    rmsLevelLeft.skip(numSamples);   
+    rmsLevelRight.skip(numSamples);
+    
+    {
+        const auto value = Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples));
+
+        if (value < rmsLevelLeft.getCurrentValue())
+            rmsLevelLeft.setTargetValue(value);
+        else
+            rmsLevelLeft.setCurrentAndTargetValue(value);
+    }
+
+    {
+        const auto value = Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples));
+
+        if (value < rmsLevelRight.getCurrentValue())
+            rmsLevelRight.setTargetValue(value);
+        else
+            rmsLevelRight.setCurrentAndTargetValue(value);
+    }
+
 
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -190,10 +212,10 @@ void LevelMeterAudioProcessor::setStateInformation(const void* data, int sizeInB
 float LevelMeterAudioProcessor::getRmsLevel(const int channel)
 {
     jassert(channel == 0 || channel == 1);
-    if(channel == 0)
-        return rmsLevelLeft;
-    if(channel == 1)
-        return rmsLevelRight;
+    if (channel == 0)
+        return rmsLevelLeft.getCurrentValue();
+    if (channel == 1)
+        return rmsLevelRight.getCurrentValue();
 }
 
 // std::vector<float> LevelMeterAudioProcessor::getRmsLevels()

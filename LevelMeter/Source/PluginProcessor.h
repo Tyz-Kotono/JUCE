@@ -62,7 +62,7 @@ public:
 private:
     // AudioProcessorValueTreeState parameters;
 
-    float rmsLevelLeft, rmsLevelRight;
+     LinearSmoothedValue<float> rmsLevelLeft, rmsLevelRight;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterAudioProcessor)
 };
