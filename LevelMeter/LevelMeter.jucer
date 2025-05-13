@@ -5,6 +5,9 @@
               pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
               cppLanguageStandard="20">
   <MAINGROUP id="WnXJi9" name="LevelMeter">
+    <GROUP id="{525FFE0E-E005-D58C-6D22-C025999DB29E}" name="Assets">
+      <FILE id="XRmy0w" name="MeterGrill.png" compile="0" resource="1" file="Assets/MeterGrill.png"/>
+    </GROUP>
     <GROUP id="{A53B2E0E-9D5F-8B8B-2CD0-5F910A43CC78}" name="Source">
       <GROUP id="{F3CA8947-AAF6-845C-0A3F-826CFE8E0C3C}" name="Component">
         <FILE id="K5E7bE" name="CircularMeter.h" compile="0" resource="0" file="Source/Component/CircularMeter.h"/>

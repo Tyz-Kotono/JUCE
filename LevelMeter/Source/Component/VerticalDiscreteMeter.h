@@ -30,6 +30,8 @@ namespace Gui
 			}
 			const auto delta = 4.f;
 			const auto bounds = getLocalBounds().toFloat().reduced(delta);
+
+
 			const auto side = jmin(bounds.getWidth(), bounds.getHeight());
 			const auto bulbFillBounds = Rectangle<float>{ bounds.getX(), bounds.getY(), side, side };
 			g.fillEllipse(bulbFillBounds);
@@ -37,7 +39,13 @@ namespace Gui
 			g.drawEllipse(bulbFillBounds, 1.f);
 			if (isOn)
 			{
-				g.setGradientFill(ColourGradient{ colour.withAlpha(0.3f), bulbFillBounds.getCentre(), colour.withLightness(1.5f).withAlpha(0.f), {}, true });
+				g.setGradientFill(ColourGradient{
+					colour.withAlpha(0.3f),
+					bulbFillBounds.getCentre(),
+					colour.withLightness(1.5f).withAlpha(0.f),
+					{},
+					true
+				});
 				g.fillEllipse(bulbFillBounds.expanded(delta));
 			}
 					
