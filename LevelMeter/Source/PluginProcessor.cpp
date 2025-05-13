@@ -21,7 +21,9 @@ LevelMeterAudioProcessor::LevelMeterAudioProcessor()
 #endif
     )
 #endif
+    
 {
+    
 }
 
 LevelMeterAudioProcessor::~LevelMeterAudioProcessor()
@@ -184,6 +186,19 @@ void LevelMeterAudioProcessor::setStateInformation(const void* data, int sizeInB
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
+
+float LevelMeterAudioProcessor::getRmsLevel(const int channel)
+{
+    jassert(channel == 0 || channel == 1);
+    if(channel == 0)
+        return rmsLevelLeft;
+    if(channel == 1)
+        return rmsLevelRight;
+}
+
+// std::vector<float> LevelMeterAudioProcessor::getRmsLevels()
+// {
+// }
 
 //==============================================================================
 // This creates new instances of the plugin..

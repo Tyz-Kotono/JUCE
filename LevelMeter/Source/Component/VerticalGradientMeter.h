@@ -20,7 +20,7 @@ namespace Gui
     VerticalGradientMeter(std::function<float()>&& valueFunction) : valueSupplier(std::move(valueFunction))
     {
       startTimerHz(24);
-      grill = ImageCache::getFromMemory(BinaryData::MeterGrill_png, BinaryData::MeterGrill_pngSize);
+      // grill = ImageCache::getFromMemory(BinaryData::MeterGrill_png, BinaryData::MeterGrill_pngSize);
     }
 		
     void paint(Graphics& g) override
